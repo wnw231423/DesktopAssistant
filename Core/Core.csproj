@@ -9,8 +9,10 @@
 
     <ItemGroup>
       <Folder Include="AI\" />
-      <Folder Include="Table\" />
-      <Folder Include="TODO\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Data\Data.csproj" />
     </ItemGroup>
 
 </Project>
