@@ -32,51 +32,36 @@ public class TableService
             return "转换字符串失败";
         }
     }
+    
+    // 获取指定日期的课程
+    public List<Course> GetCoursesByDate(DateTime date)
+    {
+        // 计算是第几周
+        int daysDiff = (int)(date - Data.Models.Table.Table.First).TotalDays;
+        int weekNumber = daysDiff < 0 ? 0 : (daysDiff / 7) + 1;
+        
+        // 获取星期几
+        string weekday = date.DayOfWeek switch
+        {
+            DayOfWeek.Monday => "周一",
+            DayOfWeek.Tuesday => "周二",
+            DayOfWeek.Wednesday => "周三",
+            DayOfWeek.Thursday => "周四",
+            DayOfWeek.Friday => "周五",
+            DayOfWeek.Saturday => "周六",
+            DayOfWeek.Sunday => "周日",
+            _ => ""
+        };
+        
+        // 筛选课程
+        var allCourses = GetCourses();
+        return allCourses.Where(c => c.Weekday == weekday && c.IsInWeek(weekNumber)).ToList();
+    }
 
     // 获取今天的课程
     public List<Course> GetTodaysCourses()
     {
-        try
-        {
-            string today;
-            DateTime now = DateTime.Now;
-            string dayOfWeek = now.DayOfWeek.ToString();
-            switch (dayOfWeek)
-            {
-                case "Monday":
-                    today = "周一";
-                    break;
-                case "Tuesday":
-                    today = "周二";
-                    break;
-                case "Wednesday":
-                    today = "周三";
-                    break;
-                case "Thursday":
-                    today = "周四";
-                    break;
-                case "Friday":
-                    today = "周五";
-                    break;
-                case "Saturday":
-                    today = "周六";
-                    break;
-                case "Sunday":
-                    today = "周日";
-                    break;
-                default:
-                    today = "未知";
-                    break;
-            }
-            using var context = new DaContext();
-            var courses = context.Courses.Where(c => c.Weekday == today).ToList();
-            return courses;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"获取今日课程失败{ex.Message}");
-            return new List<Course>();
-        }
+        return GetCoursesByDate(DateTime.Today);
     }
     
     // 添加课程
@@ -118,5 +103,28 @@ public class TableService
     {
         RemoveCourse(course.Id);
         AddCourse(course);
+    }
+    
+    // 用于GUI添加测试数据
+    public void AddSampleCourses()
+    {
+        var courses = new List<Course>
+        {
+            new Course("高等数学", "1-2", "周一", 1, 2, "A202", "张教授"),
+            new Course("线性代数",  "3-5","周二", 3, 5, "B305", "李教授"),
+            new Course("程序设计", "6-8", "周三", 6, 8, "计算机楼C304", "王教授"),
+            new Course("数据结构", "11-13", "周四", 1, 2, "A402", "赵教授")
+        };
+        
+        using var context = new DaContext();
+        foreach(var course in courses)
+        {
+            if (!context.Courses.Any(c => c.CourseName == course.CourseName &&
+                                          c.Weekday == course.Weekday))
+            {
+                context.Courses.Add(course);
+            }
+        }
+        context.SaveChanges();
     }
 }
