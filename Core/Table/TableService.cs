@@ -12,10 +12,7 @@ public class TableService
         var courses = ctx.Courses.ToList();
         return courses;
     }
-    private string ConvertToStr(Course course)
-    {
-        return ($"课程名称：{course.CourseName}\n" + $"课程时间：{course.Weekday}  {course.StartTime.ToString("HH: mm")}-{course.EndTime.ToString("HH: mm")}\n" + $"上课地点：{course.Classroom}\n" + $"授课教师：{course.Teacher}\n");
-    }
+    
     // 以字符串的形式返回所有课程的信息, 用于AI模块
     public string GetCoursesString()
     {
@@ -26,7 +23,7 @@ public class TableService
             {
                 return "暂无课程信息";
             }
-            var dataStrings = courses.Select(course => ConvertToStr(course));
+            var dataStrings = courses.Select(course => course.ToString());
             return String.Join("\n\n", dataStrings);
         }
         catch (Exception ex)
@@ -40,7 +37,7 @@ public class TableService
     public List<Course> GetTodaysCourses()
     {
         try
-        {//TODO
+        {
             string today;
             DateTime now = DateTime.Now;
             string dayOfWeek = now.DayOfWeek.ToString();
@@ -78,7 +75,7 @@ public class TableService
         catch (Exception ex)
         {
             Console.WriteLine($"获取今日课程失败{ex.Message}");
-            return null;
+            return new List<Course>();
         }
     }
     
@@ -87,7 +84,6 @@ public class TableService
     {
         try
         {
-            //TODO
             using var context = new DaContext();
             context.Courses.Add(course);
             context.SaveChanges();

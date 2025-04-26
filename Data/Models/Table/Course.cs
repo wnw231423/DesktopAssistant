@@ -23,5 +23,12 @@ public class Course
         Teacher = teacher;
     }
 
+    public override string ToString()
+    {
+        return ($"课程名称：{CourseName}\n" 
+                + $"课程时间：{Weekday}  {StartTime:HH: mm}-{EndTime:HH: mm}\n" 
+                + $"上课地点：{Classroom}\n" + $"授课教师：{Teacher}\n");
+    }
+
     //TODO: Add properties for Course class.
 }
