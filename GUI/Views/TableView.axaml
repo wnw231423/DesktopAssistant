@@ -2,7 +2,94 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="GUI.Views.TableView">
-    Welcome to Avalonia!
+             xmlns:vm="using:GUI.ViewModels"
+             x:Class="GUI.Views.TableView"
+             x:DataType="vm:TableViewModel">
+
+  <Grid RowDefinitions="Auto,*">
+    <!-- 顶部控制栏 -->
+    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="10">
+      <Button Content="上一周" Command="{Binding PreviousWeekCommand}"/>
+      <TextBlock Text="{Binding CurrentWeek, StringFormat='第 {0} 周'}"
+                 VerticalAlignment="Center" FontWeight="Bold"/>
+      <Button Content="下一周" Command="{Binding NextWeekCommand}"/>
+      <Button Content="添加课程" Command="{Binding AddCourseCommand}"/>
+    </StackPanel>
+
+    <!-- 课表内容区域 - 添加ScrollViewer -->
+    <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Margin="10">
+      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid x:Name="TableGrid">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+
+          <!-- 表头行 -->
+          <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="60"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 左上角 -->
+            <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+              <TextBlock Text="节次" HorizontalAlignment="Center"/>
+            </Border>
+
+            <!-- 星期标题 -->
+            <Border Grid.Column="1" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+              <TextBlock Text="周一" HorizontalAlignment="Center"/>
+            </Border>
+
+            <Border Grid.Column="2" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+              <TextBlock Text="周二" HorizontalAlignment="Center"/>
+            </Border>
+
+            <Border Grid.Column="3" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+              <TextBlock Text="周三" HorizontalAlignment="Center"/>
+            </Border>
+
+            <Border Grid.Column="4" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+              <TextBlock Text="周四" HorizontalAlignment="Center"/>
+            </Border>
+
+            <Border Grid.Column="5" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+              <TextBlock Text="周五" HorizontalAlignment="Center"/>
+            </Border>
+
+            <Border Grid.Column="6" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+              <TextBlock Text="周六" HorizontalAlignment="Center"/>
+            </Border>
+
+            <Border Grid.Column="7" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+              <TextBlock Text="周日" HorizontalAlignment="Center"/>
+            </Border>
+          </Grid>
+
+          <!-- 课表主体区域 -->
+          <Grid Grid.Row="1" x:Name="CourseGrid">
+            <!-- 列定义 -->
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="60"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <!-- 行定义会在代码中动态添加 -->
+          </Grid>
+        </Grid>
+      </ScrollViewer>
+    </Border>
+  </Grid>
 </UserControl>

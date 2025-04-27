@@ -4,19 +4,23 @@ using Avalonia.Styling;
 using GUI.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.Table;
 
 namespace GUI.ViewModels
 {
     public partial class MainWindowViewModel : ObservableObject
     {
         [ObservableProperty]
-        private object _currentView;
+        // Should change to ViewModelBase when no place holder
+        private Object _currentView;
 
         [ObservableProperty]
         private string _selectedPageTag;
 
         [ObservableProperty]
         private bool _isDarkTheme;
+        
+        private TableViewModel _tableViewModel;
 
         public MainWindowViewModel()
         {
@@ -26,6 +30,8 @@ namespace GUI.ViewModels
             {
                 IsDarkTheme = true;
             }
+            
+            _tableViewModel = new TableViewModel(new TableService());
 
             // 默认导航到课表页面
             Navigate("Table");
@@ -39,7 +45,7 @@ namespace GUI.ViewModels
             switch (destination)
             {
                 case "Table":
-                    CurrentView = new TableView();
+                    CurrentView = _tableViewModel;
                     break;
                 case "Todo":
                     // 稍后实现
@@ -50,7 +56,7 @@ namespace GUI.ViewModels
                     CurrentView = new PlaceholderView("设置页面开发中");
                     break;
                 default:
-                    CurrentView = new TableView();
+                    CurrentView = _tableViewModel;
                     break;
             }
         }

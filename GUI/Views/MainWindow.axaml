@@ -11,7 +11,8 @@
         Title="武大课表助手"
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent"
-        ExtendClientAreaToDecorationsHint="True">
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="32">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -70,6 +71,14 @@
                 <ColumnDefinition Width="64"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
+            
+            <!-- 标题栏 -->
+            <Border Grid.ColumnSpan="2"
+                    Name="TitleBarHost"
+                    Background="{DynamicResource PrimaryBackgroundBrush}"
+                    Height="32" VerticalAlignment="Top"
+                    IsHitTestVisible="False"
+                    Opacity="0.8"/>
 
             <!-- 侧边导航栏 -->
             <Border Background="{DynamicResource SecondaryBackgroundBrush}"
@@ -140,12 +149,6 @@
                 <!-- 内容转换器 -->
                 <ContentControl Content="{Binding CurrentView}"/>
             </Border>
-            
-            <!-- 窗口标题背景遮罩 - 解决透明窗口标题栏问题 -->
-            <Border Grid.ColumnSpan="2"
-                    Background="{DynamicResource PrimaryBackgroundBrush}"
-                    Height="32" VerticalAlignment="Top" IsHitTestVisible="False"
-                    Opacity="0.8"/>
         </Grid>
     </Border>
 </Window>
