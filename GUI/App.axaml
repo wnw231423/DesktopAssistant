@@ -2,14 +2,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="GUI.App"
              xmlns:local="using:GUI"
+             xmlns:converters="using:GUI.Converters"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
-  
+
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <converters:EqualityConverter x:Key="EqualityConverter"/>
+            <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Assets/ThemeResources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>

@@ -1,0 +1,15 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- 标准色 -->
+    <Color x:Key="LuojiaBlueColor">#002554</Color>  <!-- 珞珈蓝 0, 37, 84 -->
+    <Color x:Key="LuojiaGreenColor">#115740</Color> <!-- 珞珈绿 17, 87, 64 -->
+    
+    <!-- 辅助色 -->
+    <Color x:Key="LuoyingPinkColor">#F8A3BC</Color>  <!-- 珞樱粉 248, 163, 188 -->
+    <Color x:Key="DonghuBlueColor">#41B6E6</Color>   <!-- 东湖蓝 65, 182, 230 -->
+    <Color x:Key="QiuguiYellowColor">#FFA300</Color> <!-- 秋桂黄 255, 163, 0 -->
+    <Color x:Key="ChuntenPurpleColor">#33058D</Color> <!-- 春藤紫 51, 5, 141 -->
+    <Color x:Key="HongwaGreenColor">#00797C</Color>  <!-- 黉瓦绿 0, 121, 124 -->
+    <Color x:Key="ShuangyeRedColor">#FF0800</Color>  <!-- 霜叶红 255, 8, 0 -->
+    <Color x:Key="ChenwuGrayColor">#C1C6C8</Color>   <!-- 晨雾灰 193, 198, 200 -->
+</ResourceDictionary>

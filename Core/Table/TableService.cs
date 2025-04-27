@@ -1,0 +1,130 @@
+﻿using Data.Models;
+using Data.Models.Table;
+
+namespace Core.Table;
+
+public class TableService
+{
+    // 获取数据库中的所有课程
+    public List<Course> GetCourses()
+    {
+        using var ctx = new DaContext();
+        var courses = ctx.Courses.ToList();
+        return courses;
+    }
+    
+    // 以字符串的形式返回所有课程的信息, 用于AI模块
+    public string GetCoursesString()
+    {
+        try
+        {
+            var courses = GetCourses();
+            if (courses == null || courses.Count == 0)
+            {
+                return "暂无课程信息";
+            }
+            var dataStrings = courses.Select(course => course.ToString());
+            return String.Join("\n\n", dataStrings);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"转换字符串失败：{ex.Message}");
+            return "转换字符串失败";
+        }
+    }
+    
+    // 获取指定日期的课程
+    public List<Course> GetCoursesByDate(DateTime date)
+    {
+        // 计算是第几周
+        int daysDiff = (int)(date - Data.Models.Table.Table.First).TotalDays;
+        int weekNumber = daysDiff < 0 ? 0 : (daysDiff / 7) + 1;
+        
+        // 获取星期几
+        string weekday = date.DayOfWeek switch
+        {
+            DayOfWeek.Monday => "周一",
+            DayOfWeek.Tuesday => "周二",
+            DayOfWeek.Wednesday => "周三",
+            DayOfWeek.Thursday => "周四",
+            DayOfWeek.Friday => "周五",
+            DayOfWeek.Saturday => "周六",
+            DayOfWeek.Sunday => "周日",
+            _ => ""
+        };
+        
+        // 筛选课程
+        var allCourses = GetCourses();
+        return allCourses.Where(c => c.Weekday == weekday && c.IsInWeek(weekNumber)).ToList();
+    }
+
+    // 获取今天的课程
+    public List<Course> GetTodaysCourses()
+    {
+        return GetCoursesByDate(DateTime.Today);
+    }
+    
+    // 添加课程
+    public void AddCourse(Course course)
+    {
+        try
+        {
+            using var context = new DaContext();
+            context.Courses.Add(course);
+            context.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"添加课程失败{ex.Message}");
+        }
+    }
+    
+    // 删除课程, 根据课程ID
+    public void RemoveCourse(int id)
+    {
+        try
+        {
+            using var context = new DaContext();
+            var course = context.Courses.Find(id);
+            if (course != null)
+            {
+                context.Courses.Remove(course);
+                context.SaveChanges();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"删除课程失败{ex.Message}");
+        }
+    }
+    
+    // 更新课程
+    public void UpdateCourse(Course course)
+    {
+        RemoveCourse(course.Id);
+        AddCourse(course);
+    }
+    
+    // 用于GUI添加测试数据
+    public void AddSampleCourses()
+    {
+        var courses = new List<Course>
+        {
+            new Course("高等数学", "1-2", "周一", 1, 2, "A202", "张教授"),
+            new Course("线性代数",  "3-5","周二", 3, 5, "B305", "李教授"),
+            new Course("程序设计", "6-8", "周三", 6, 8, "计算机楼C304", "王教授"),
+            new Course("数据结构", "11-13", "周四", 1, 2, "A402", "赵教授")
+        };
+        
+        using var context = new DaContext();
+        foreach(var course in courses)
+        {
+            if (!context.Courses.Any(c => c.CourseName == course.CourseName &&
+                                          c.Weekday == course.Weekday))
+            {
+                context.Courses.Add(course);
+            }
+        }
+        context.SaveChanges();
+    }
+}

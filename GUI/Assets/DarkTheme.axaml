@@ -1,0 +1,24 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- 引用基础颜色 -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Assets/ColorDefinitions.axaml"/>
+    </ResourceDictionary.MergedDictionaries>
+    
+    <!-- 深色主题 UI 元素颜色 -->
+    <SolidColorBrush x:Key="PrimaryBackgroundBrush" Color="#121212"/>
+    <SolidColorBrush x:Key="SecondaryBackgroundBrush" Color="#1E1E1E"/>
+    <SolidColorBrush x:Key="PrimaryForegroundBrush" Color="White"/>
+    
+    <SolidColorBrush x:Key="PrimaryAccentBrush" Color="{StaticResource LuojiaGreenColor}"/>
+    <SolidColorBrush x:Key="SecondaryAccentBrush" Color="{StaticResource LuoyingPinkColor}"/>
+    
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#2D2D2D"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#333333"/>
+    
+    <!-- 功能性颜色 - 深色模式下稍微亮一些 -->
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource DonghuBlueColor}"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource LuojiaGreenColor}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource QiuguiYellowColor}"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ShuangyeRedColor}"/>
+</ResourceDictionary>

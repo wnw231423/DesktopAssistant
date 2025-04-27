@@ -1,20 +1,154 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:GUI.ViewModels"
+        xmlns:views="using:GUI.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="GUI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="GUI">
+        Title="武大课表助手"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="32">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Window.Styles>
+        <!-- 侧边导航按钮样式 -->
+        <Style Selector="Button.NavButton">
+            <Setter Property="Width" Value="48"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="Margin" Value="0,4"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}"/>
+        </Style>
+        
+        <Style Selector="Button.NavButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}"/>
+        </Style>
+        
+        <Style Selector="Button.NavButton:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        </Style>
+        
+        <Style Selector="Button.NavButton[IsEnabled=True][Tag=Selected]">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryAccentBrush}"/>
+        </Style>
+        
+        <!-- 主题切换按钮样式 -->
+        <Style Selector="Button.ThemeButton">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}"/>
+        </Style>
+        
+        <Style Selector="Button.ThemeButton:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}"/>
+        </Style>
+    </Window.Styles>
 
+    <Border Background="{DynamicResource PrimaryBackgroundBrush}"
+            CornerRadius="12" Margin="8">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="64"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- 标题栏 -->
+            <Border Grid.ColumnSpan="2"
+                    Name="TitleBarHost"
+                    Background="{DynamicResource PrimaryBackgroundBrush}"
+                    Height="32" VerticalAlignment="Top"
+                    IsHitTestVisible="False"
+                    Opacity="0.8"/>
+
+            <!-- 侧边导航栏 -->
+            <Border Background="{DynamicResource SecondaryBackgroundBrush}"
+                    CornerRadius="10,0,0,10" Margin="4,4,0,4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 应用Logo -->
+                    <TextBlock Text="武"
+                               FontSize="24" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryAccentBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,16,0,24"/>
+
+                    <!-- 导航按钮 -->
+                    <StackPanel Grid.Row="1">
+                        <Button Classes="NavButton"
+                                Tag="{Binding SelectedPageTag, Converter={StaticResource EqualityConverter}, ConverterParameter=Table}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Table">
+                            <TextBlock Text="📚"/>
+                            <ToolTip.Tip>课程表</ToolTip.Tip>
+                        </Button>
+                        
+                        <Button Classes="NavButton"
+                                Tag="{Binding SelectedPageTag, Converter={StaticResource EqualityConverter}, ConverterParameter=Todo}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Todo">
+                            <TextBlock Text="✓"/>
+                            <ToolTip.Tip>待办事项</ToolTip.Tip>
+                        </Button>
+                        
+                        <Button Classes="NavButton"
+                                Tag="{Binding SelectedPageTag, Converter={StaticResource EqualityConverter}, ConverterParameter=Settings}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Settings">
+                            <TextBlock Text="⚙"/>
+                            <ToolTip.Tip>设置</ToolTip.Tip>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- 主题切换按钮 -->
+                    <Button Grid.Row="2"
+                            Classes="ThemeButton"
+                            Command="{Binding ToggleThemeCommand}"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,16">
+                        <Panel>
+                            <TextBlock Text="🌙" IsVisible="{Binding !IsDarkTheme}"/>
+                            <TextBlock Text="☀" IsVisible="{Binding IsDarkTheme}"/>
+                        </Panel>
+                        <ToolTip.Tip>
+                            <TextBlock Text="{Binding IsDarkTheme, Converter={StaticResource ThemeTextConverter}}"/>
+                        </ToolTip.Tip>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- 内容区 -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource PrimaryBackgroundBrush}"
+                    Margin="0,4,4,4"
+                    CornerRadius="0,10,10,0">
+                <!-- 内容转换器 -->
+                <ContentControl Content="{Binding CurrentView}"/>
+            </Border>
+        </Grid>
+    </Border>
 </Window>
