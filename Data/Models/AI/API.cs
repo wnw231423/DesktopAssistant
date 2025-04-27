@@ -9,33 +9,40 @@ namespace Data.Models.AI
 {
     public class API
     {
-        private const string API_KEY = "oLKJOgjAjIewf7jUoFtirsq6";
-        private const string SECRET_KEY = "lPIWD0PU2TTa1J33BQD9ZtSU7s6lI2l6";
+        // TODO: 在本地配置文件中存储API密钥和密钥, 然后读取它. 不要直接硬编码到代码里
+        private string _api_key;
+        private string _secret_key;
         private const string TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token";
         private const string API_URL = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions";
         public string inputlist;
 
-        public static async Task AiAssistent(string inputlist)
+        public API(string api_key, string secret_key)
         {
-            var accessToken = await API.GetAccessToken();
+            _api_key = api_key;
+            _secret_key = secret_key;
+        }
+        
+        public async Task AiAssistent(string inputlist)
+        {
+            var accessToken = await GetAccessToken();
             if (string.IsNullOrEmpty(accessToken))
             {
                 Console.WriteLine("Failed to get access token");
                 return;
             }
-            await API.ChatLoop(accessToken, inputlist);
+            await ChatLoop(accessToken, inputlist);
         }
 
-        public static async Task<string> GetAccessToken()
+        public async Task<string> GetAccessToken()
         {
             using var client = new HttpClient();
-            var response = await client.GetAsync($"{TOKEN_URL}?grant_type=client_credentials&client_id={API_KEY}&client_secret={SECRET_KEY}");
+            var response = await client.GetAsync($"{TOKEN_URL}?grant_type=client_credentials&client_id={_api_key}&client_secret={_secret_key}");
             var content = await response.Content.ReadAsStringAsync();
             var json = JObject.Parse(content);
             return json["access_token"]?.ToString();
         }
 
-        public static async Task ChatLoop(string accessToken,string inputlist)
+        public async Task ChatLoop(string accessToken,string inputlist)
         {
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -75,7 +82,7 @@ namespace Data.Models.AI
             }*/
         }
 
-        public static async Task<string> SendChatRequest(HttpClient client, string accessToken, string message)
+        public async Task<string> SendChatRequest(HttpClient client, string accessToken, string message)
         {
             var requestBody = new
             {
@@ -99,7 +106,7 @@ namespace Data.Models.AI
             return await response.Content.ReadAsStringAsync();
         }
 
-        public static string ParseResponse(string response)
+        public string ParseResponse(string response)
         {
             try
             {

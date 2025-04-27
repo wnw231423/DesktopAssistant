@@ -111,13 +111,13 @@ public class TableService
         var courses = new List<Course>
         {
             new Course("高等数学", "1-2", "周一", 1, 2, "A202", "张教授"),
-            new Course("线性代数",  "3-5","周二", 3, 5, "B305", "李教授"),
+            new Course("线性代数", "3-5", "周二", 3, 5, "B305", "李教授"),
             new Course("程序设计", "6-8", "周三", 6, 8, "计算机楼C304", "王教授"),
             new Course("数据结构", "11-13", "周四", 1, 2, "A402", "赵教授")
         };
-        
+
         using var context = new DaContext();
-        foreach(var course in courses)
+        foreach (var course in courses)
         {
             if (!context.Courses.Any(c => c.CourseName == course.CourseName &&
                                           c.Weekday == course.Weekday))
@@ -125,6 +125,31 @@ public class TableService
                 context.Courses.Add(course);
             }
         }
+
         context.SaveChanges();
+    }
+    
+    // 清空course表
+    public void ClearCourses()
+    {
+        using var context = new DaContext();
+        context.Courses.RemoveRange(context.Courses);
+        context.SaveChanges();
+    }
+    
+    /*********************/
+    /*** 课程资源管理部分 ***/
+    /*********************/
+    
+    // 课程资源存储的总文件夹
+    private static string _courseResourseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "course");
+    
+    // 向课程资源文件夹中添加课程资源
+    // 例如, 课程名称为"高等数学", 资源类型为"ppt", 文件路径为"C:\Users\user\Desktop\高数课件.zip"
+    // 则将文件添加到 _courseResourceDir\高等数学\ppt\高数课件.zip
+    public void AddCourseResource(string courseName, string resourceType, string filePath)
+    {
+        // TODO
+        throw new NotImplementedException();
     }
 }

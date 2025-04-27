@@ -13,6 +13,7 @@ public class Course
     public int EndSlot { get; set; } // 结束节次
     public string Classroom { get; set; }
     public string Teacher { get; set; }
+    
 
     public Course(string courseName, string weekRange, string weekday, int startSlot, int endSlot, string classroom, string teacher)
     {
