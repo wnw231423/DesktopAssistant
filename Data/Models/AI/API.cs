@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using AI_Interface;
 
-namespace AI_Interface
+namespace Data.Models.AI
 {
-    class API
+    public class API
     {
         private const string API_KEY = "oLKJOgjAjIewf7jUoFtirsq6";
         private const string SECRET_KEY = "lPIWD0PU2TTa1J33BQD9ZtSU7s6lI2l6";
