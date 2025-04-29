@@ -9,7 +9,7 @@ namespace Data.Models.AI
 {
     public class API
     {
-        // TODO: 在本地配置文件中存储API密钥和密钥, 然后读取它. 不要直接硬编码到代码里
+        //在本地配置文件中存储API密钥和密钥, 然后读取它. 不要直接硬编码到代码里
         private string _api_key;
         private string _secret_key;
         private const string TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token";
@@ -18,10 +18,15 @@ namespace Data.Models.AI
 
         public API(string api_key, string secret_key)
         {
+            if (string.IsNullOrWhiteSpace(api_key) || string.IsNullOrWhiteSpace(secret_key))
+            {
+                throw new ArgumentException("无效的API凭证");
+            }
+
             _api_key = api_key;
             _secret_key = secret_key;
         }
-        
+
         public async Task AiAssistent(string inputlist)
         {
             var accessToken = await GetAccessToken();
@@ -48,8 +53,8 @@ namespace Data.Models.AI
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
             //Console.WriteLine("文心一言对话系统（输入'exit'退出）");
-
-            //预先设定要根据输入的课表和todo提供今日提醒
+            Console.WriteLine("祝您度过充实的一天！");
+            //预先设定要根据输入提供今日提醒
             var input1 = "今天是几号";
             var response1 = await SendChatRequest(client, accessToken, input1);
             var answer1 = ParseResponse(response1);
