@@ -13,31 +13,11 @@ public class TableService
         return courses;
     }
     
-    // 以字符串的形式返回所有课程的信息, 用于AI模块
-    public string GetCoursesString()
-    {
-        try
-        {
-            var courses = GetCourses();
-            if (courses == null || courses.Count == 0)
-            {
-                return "暂无课程信息";
-            }
-            var dataStrings = courses.Select(course => course.ToString());
-            return String.Join("\n\n", dataStrings);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"转换字符串失败：{ex.Message}");
-            return "转换字符串失败";
-        }
-    }
-    
     // 获取指定日期的课程
     public List<Course> GetCoursesByDate(DateTime date)
     {
         // 计算是第几周
-        int daysDiff = (int)(date - Data.Models.Table.Table.First).TotalDays;
+        int daysDiff = (int)(date - Data.Models.Table.TableLayout.First).TotalDays;
         int weekNumber = daysDiff < 0 ? 0 : (daysDiff / 7) + 1;
         
         // 获取星期几
@@ -55,7 +35,7 @@ public class TableService
         
         // 筛选课程
         var allCourses = GetCourses();
-        return allCourses.Where(c => c.Weekday == weekday && c.IsInWeek(weekNumber)).ToList();
+        return allCourses.Where(c => c.Weekday == weekday && IsInWeek(c, weekNumber)).ToList();
     }
 
     // 获取今天的课程
@@ -105,6 +85,42 @@ public class TableService
         AddCourse(course);
     }
     
+    // 清空course表
+    public void ClearCourses()
+    {
+        using var context = new DaContext();
+        context.Courses.RemoveRange(context.Courses);
+        context.SaveChanges();
+    }
+    
+    /****************/
+    /*** AI using ***/
+    /****************/
+    
+    // 以字符串的形式返回所有课程的信息, 用于AI模块
+    public string GetCoursesString()
+    {
+        try
+        {
+            var courses = GetCourses();
+            if (courses == null || courses.Count == 0)
+            {
+                return "暂无课程信息";
+            }
+            var dataStrings = courses.Select(course => course.ToString());
+            return String.Join("\n\n", dataStrings);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"转换字符串失败：{ex.Message}");
+            return "转换字符串失败";
+        }
+    }
+    
+    /*****************/
+    /*** GUI using ***/
+    /*****************/
+    
     // 用于GUI添加测试数据
     public void AddSampleCourses()
     {
@@ -129,12 +145,41 @@ public class TableService
         context.SaveChanges();
     }
     
-    // 清空course表
-    public void ClearCourses()
+    // 获取当前是第几周
+    public int GetCurrentWeek()
     {
-        using var context = new DaContext();
-        context.Courses.RemoveRange(context.Courses);
-        context.SaveChanges();
+        var daysDiff = (int) (DateTime.Today - TableLayout.First).TotalDays;
+        return daysDiff < 0 ? 0 : (daysDiff / 7) + 1;
+    }
+    
+    public bool IsInWeek(Course course, int weekNumber)
+    {
+        // 判断课程是否在指定周次上课
+        if (string.IsNullOrEmpty(course.WeekRange)) return true;
+        
+        var ranges = course.WeekRange.Split(',');
+        foreach(var range in ranges)
+        {
+            if (range.Contains('-'))
+            {
+                var parts = range.Split('-');
+                if (parts.Length == 2)
+                {
+                    if (int.TryParse(parts[0], out int start) && 
+                        int.TryParse(parts[1], out int end))
+                    {
+                        if (weekNumber >= start && weekNumber <= end)
+                            return true;
+                    }
+                }
+            }
+            else
+            {
+                if (int.TryParse(range, out int week) && week == weekNumber)
+                    return true;
+            }
+        }
+        return false;
     }
     
     /*********************/

@@ -95,7 +95,7 @@ namespace Test
             _tableService.ClearCourses();
             
             // 设置测试数据，使用固定的日期
-            Data.Models.Table.Table.First = new DateTime(2023, 9, 1); // 假设9月1日是周五
+            Data.Models.Table.TableLayout.First = new DateTime(2023, 9, 1); // 假设9月1日是周五
             
             // 添加两门课程，一门在周一，一门在周五
             var courseMonday = new Course("周一课程", "1-16", "周一", 1, 2, "A101", "测试教授");
@@ -176,7 +176,7 @@ namespace Test
             };
             
             // 计算当前是第几周
-            int daysDiff = (int)(DateTime.Today - Data.Models.Table.Table.First).TotalDays;
+            int daysDiff = (int)(DateTime.Today - Data.Models.Table.TableLayout.First).TotalDays;
             int weekNumber = daysDiff < 0 ? 0 : (daysDiff / 7) + 1;
             string weekPattern = $"{weekNumber}";
             

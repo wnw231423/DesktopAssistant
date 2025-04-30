@@ -18,22 +18,18 @@ public partial class TableViewModel : ViewModelBase
     [ObservableProperty]
     private ObservableCollection<Course> _filteredCourses;
 
-    // 星期列表
-    public List<string> WeekDays { get; } = new List<string>
-        { "周一", "周二", "周三", "周四", "周五", "周六", "周日" };
-
     // 时间段列表
-    public List<TimeSlot> TimeSlots => Table.TimeSlots;
+    public List<TimeSlot> TimeSlots => TableLayout.TimeSlots;
 
     // 总周数
-    public int TotalWeek => Table.TotalWeek;
+    public int TotalWeek => TableLayout.TotalWeek;
 
     public TableViewModel(TableService tableService)
     {
         _tableService = tableService;
         
         // 初始化当前周
-        _currentWeek = Table.GetCurrentWeek();
+        _currentWeek = _tableService.GetCurrentWeek();
         if (_currentWeek > TotalWeek)
             _currentWeek = 1;
         
@@ -46,7 +42,7 @@ public partial class TableViewModel : ViewModelBase
     {
         var courses = _tableService.GetCourses();
         FilteredCourses = new ObservableCollection<Course>(
-            courses.Where(c => c.IsInWeek(CurrentWeek)));
+            courses.Where(c => _tableService.IsInWeek(c, CurrentWeek)));
     }
 
     [RelayCommand]

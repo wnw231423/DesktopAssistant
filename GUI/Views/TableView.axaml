@@ -5,6 +5,12 @@
              xmlns:vm="using:GUI.ViewModels"
              x:Class="GUI.Views.TableView"
              x:DataType="vm:TableViewModel">
+  
+  <UserControl.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}"/>
+    </Style>
+  </UserControl.Styles>
 
   <Grid RowDefinitions="Auto,*">
     <!-- 顶部控制栏 -->

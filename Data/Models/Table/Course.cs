@@ -29,37 +29,17 @@ public class Course
     public override string ToString()
     {
         return ($"课程名称：{CourseName}\n" 
-                + $"课程时间：{Weekday}  {Table.GetCourseTime(StartSlot, EndSlot)}\n" 
+                + $"课程时间：{Weekday}  {GetCourseTime(StartSlot, EndSlot)}\n" 
                 + $"上课地点：{Classroom}\n" + $"授课教师：{Teacher}\n");
     }
-
-    public bool IsInWeek(int weekNumber)
+    
+    // 输入一对slot Number,返回对应的时间段. 用于显示课程时间
+    private string GetCourseTime(int startSlot, int endSlot)
     {
-        // 判断课程是否在指定周次上课
-        if (string.IsNullOrEmpty(WeekRange)) return true;
-        
-        var ranges = WeekRange.Split(',');
-        foreach(var range in ranges)
-        {
-            if (range.Contains('-'))
-            {
-                var parts = range.Split('-');
-                if (parts.Length == 2)
-                {
-                    if (int.TryParse(parts[0], out int start) && 
-                        int.TryParse(parts[1], out int end))
-                    {
-                        if (weekNumber >= start && weekNumber <= end)
-                            return true;
-                    }
-                }
-            }
-            else
-            {
-                if (int.TryParse(range, out int week) && week == weekNumber)
-                    return true;
-            }
-        }
-        return false;
+        TimeOnly startTime = Data.Models.Table.TableLayout.TimeSlots[startSlot - 1].StartTime;
+        TimeOnly endTime = Data.Models.Table.TableLayout.TimeSlots[endSlot - 1].EndTime;
+        return $"{startTime:HH:mm}-{endTime:HH:mm}";
     }
+
+
 }

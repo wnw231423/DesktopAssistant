@@ -3,7 +3,7 @@
              x:Class="GUI.App"
              xmlns:local="using:GUI"
              xmlns:converters="using:GUI.Converters"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Light">
 
     <Application.DataTemplates>
         <local:ViewLocator/>
