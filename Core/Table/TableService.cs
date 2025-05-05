@@ -194,6 +194,33 @@ public class TableService
     // 则将文件添加到 _courseResourceDir\高等数学\ppt\高数课件.zip
     public void AddCourseResource(string courseName, string resourceType, string filePath)
     {
+        // 需要注意是否已有同名文件, 有则需要报错
+        
+        // TODO
+        throw new NotImplementedException();
+    }
+    
+    // 读取某个课程的所有课程资源
+    public List<ResourceInfo> GetCourseResources(string courseName)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+    
+    // 删除课程资源
+    // 例如, 课程名称为"高等数学", 资源类型为"ppt", 文件名为"高数课件.zip"
+    // 则删除 _courseResourceDir\高等数学\ppt\高数课件.zip
+    public void DeleteCourseResource(string courseName, string resourceType, string fileName)
+    {
+        // 如果文件不存在, 直接return即可
+        
+        // TODO
+        throw new NotImplementedException();
+    }
+    
+    // 打开某资源
+    public void OpenCourseResource(string courseName, string resourceType, string fileName)
+    {
         // TODO
         throw new NotImplementedException();
     }
