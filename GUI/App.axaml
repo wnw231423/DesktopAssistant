@@ -17,6 +17,7 @@
         <ResourceDictionary>
             <converters:EqualityConverter x:Key="EqualityConverter"/>
             <converters:ThemeTextConverter x:Key="ThemeTextConverter"/>
+            <converters:BoolToArrowConverter x:Key="BoolToArrow"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Assets/ThemeResources.axaml"/>
             </ResourceDictionary.MergedDictionaries>

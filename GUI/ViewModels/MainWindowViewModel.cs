@@ -5,6 +5,7 @@ using GUI.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.Table;
+using Data.Models.Table;
 
 namespace GUI.ViewModels
 {

@@ -1,0 +1,94 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:GUI.ViewModels"
+             xmlns:converters="using:GUI.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="GUI.Views.ResourcesView"
+             x:DataType="vm:ResourcesViewModel">
+
+    <UserControl.Resources>
+        <converters:BoolToArrowConverter x:Key="BoolToArrow"/>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <!-- 样式省略 -->
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- 顶部标题 -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+            <TextBlock Grid.Column="0"
+                       Text="{Binding Course.CourseName, StringFormat='{}{0} - 课程资源'}"
+                       FontSize="18" FontWeight="SemiBold"
+                       VerticalAlignment="Center"/>
+
+            <Button Grid.Column="1"
+                    Content="添加新类型"
+                    Command="{Binding AddResourceTypeCommand}"/>
+        </Grid>
+
+        <!-- 资源列表 -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel>
+                <!-- 无资源时显示 -->
+                <TextBlock Text="此课程暂无资源，请点击类别旁的添加按钮上传资源。"
+                           IsVisible="{Binding !ResourceGroups.Count}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Margin="0,20,0,0"/>
+
+                <!-- 资源组列表 - 不使用编译时绑定 -->
+                <ItemsControl ItemsSource="{Binding ResourceGroups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,5">
+                                <!-- 资源类型标题 -->
+                                <Border Classes="group">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Button Grid.Column="0"
+                                                Content="{Binding IsExpanded, Converter={StaticResource BoolToArrow}}"
+                                                Command="{Binding (vm:ResourcesViewModel).AddResourceCommand}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Padding="0"
+                                                Margin="0,0,8,0"
+                                                VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Column="1"
+                                                 Text="{Binding TypeName}"
+                                                 FontWeight="SemiBold"
+                                                 VerticalAlignment="Center"/>
+
+                                        <Button Grid.Column="2"
+                                                Content="添加"
+                                                Command="{Binding (vm:ResourcesViewModel).ToggleExpandCommand}"
+                                                CommandParameter="{Binding TypeName}"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- 资源项列表 -->
+                                <ItemsControl ItemsSource="{Binding Resources}"
+                                              IsVisible="{Binding IsExpanded}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Classes="item" Margin="30,4,0,0">
+                                                <Grid ColumnDefinitions="*,Auto,Auto">
+                                                    <TextBlock Grid.Column="0"
+                                                              Text="{Binding ResourceName}"
+                                                              VerticalAlignment="Center" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
