@@ -124,6 +124,7 @@ public class TableService
     // 用于GUI添加测试数据
     public void AddSampleCourses()
     {
+        ClearCourses();
         var courses = new List<Course>
         {
             new Course("高等数学", "1-2", "周一", 1, 2, "A202", "张教授"),

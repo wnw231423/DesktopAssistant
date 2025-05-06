@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Styling;
 using Data.Models.Table;
 using GUI.ViewModels;
 
@@ -15,10 +17,19 @@ public partial class TableView : UserControl
 {
     private Grid _courseGrid;
     private TableViewModel _viewModel;
+    private bool _isInitialized = false;
+    
+    // 存储课程名称与颜色的对应关系
+    private static Dictionary<string, int> _courseColorIndices;
 
     public TableView()
     {
         InitializeComponent();
+        
+        // 在加载完成后执行一次性初始化
+        Loaded += (_, _) => OnControlLoaded();
+        
+        // 监听DataContext变化
         DataContextChanged += OnDataContextChanged;
     }
 
@@ -27,11 +38,72 @@ public partial class TableView : UserControl
         AvaloniaXamlLoader.Load(this);
         _courseGrid = this.FindControl<Grid>("CourseGrid");
     }
+    
+    /// <summary>
+    /// 控件加载完成时执行初始化
+    /// </summary>
+    private void OnControlLoaded()
+    {
+        if (!_isInitialized && DataContext is TableViewModel)
+        {
+            _isInitialized = true;
+            // 控件已完全加载，可以安全地初始化
+        }
+    }
 
+    /// <summary>
+    /// 当DataContext发生变化时调用
+    /// </summary>
     private void OnDataContextChanged(object? sender, EventArgs e)
     {
-        _viewModel = DataContext as TableViewModel;
+        // 清理旧的事件订阅，防止内存泄漏
         if (_viewModel != null)
+        {
+            _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        }
+
+        // 获取新的ViewModel
+        _viewModel = DataContext as TableViewModel;
+        
+        if (_viewModel != null)
+        {
+            // 添加属性变更监听
+            _viewModel.PropertyChanged += OnViewModelPropertyChanged;
+            
+            // 初始化UI界面
+            InitializeView();
+        }
+    }
+    
+    /// <summary>
+    /// 处理ViewModel属性变更事件
+    /// </summary>
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(TableViewModel.FilteredCourses))
+        {
+            DisplayCourses();
+        }
+        else if (args.PropertyName == nameof(TableViewModel.CurrentWeek))
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"当前周变更为: {_viewModel.CurrentWeek}");
+                UpdateWeekdayHeaders();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"更新周标题时出错: {ex.Message}");
+            }
+        }
+    }
+    
+    /// <summary>
+    /// 初始化整个视图
+    /// </summary>
+    private void InitializeView()
+    {
+        try
         {
             // 初始化课表网格
             InitializeCourseGrid();
@@ -39,88 +111,106 @@ public partial class TableView : UserControl
             // 显示课程
             DisplayCourses();
             
-            // 更新星期列的日期, 用于按了上一周或下一周的按钮后
+            // 更新星期头部显示
             UpdateWeekdayHeaders();
-
-            // 监听课程变化
-            _viewModel.PropertyChanged += (s, args) =>
-            {
-                if (args.PropertyName == nameof(TableViewModel.FilteredCourses))
-                {
-                    DisplayCourses();
-                }
-                if (args.PropertyName == nameof(TableViewModel.CurrentWeek))
-                {
-                    System.Diagnostics.Debug.WriteLine("CurrentWeek changed to: " + _viewModel.CurrentWeek);
-                    UpdateWeekdayHeaders();
-                }
-            };
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"初始化视图失败: {ex.Message}");
         }
     }
 
+    /// <summary>
+    /// 初始化课表网格基础结构
+    /// </summary>
     private void InitializeCourseGrid()
     {
-        // 清除现有行定义
-        _courseGrid.RowDefinitions.Clear();
-
-        // 添加行定义 - 课节数量 - 使用Star布局单位
-        foreach (var _ in _viewModel.TimeSlots)
+        if (_viewModel == null || _courseGrid == null) return;
+        
+        try
         {
-            _courseGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridUnitType.Star)));
-        }
+            // 清除现有行定义
+            _courseGrid.RowDefinitions.Clear();
 
-        // 添加时间节次显示列
+            // 添加行定义 - 课节数量
+            foreach (var _ in _viewModel.TimeSlots)
+            {
+                _courseGrid.RowDefinitions.Add(new RowDefinition(new GridLength(1, GridUnitType.Star)));
+            }
+
+            // 添加时间节次显示列
+            CreateTimeSlotColumn();
+
+            // 添加基础网格线
+            CreateGridLines();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"初始化课表网格失败: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// 创建时间节次列
+    /// </summary>
+    private void CreateTimeSlotColumn()
+    {
+        if (_viewModel == null || _courseGrid == null) return;
+        
         for (int i = 0; i < _viewModel.TimeSlots.Count; i++)
         {
             var timeSlot = _viewModel.TimeSlots[i];
-            
+
             var border = new Border
             {
                 BorderBrush = Brushes.Gray,
                 BorderThickness = new Thickness(0, 0, 1, 1),
-                MinHeight = 50 // 使用最小高度而不是固定高度
+                MinHeight = 50
             };
-            
+
             var panel = new StackPanel
             {
                 Margin = new Thickness(2),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            
-            var textBlock1 = new TextBlock
+
+            panel.Children.Add(new TextBlock
             {
                 Text = $"第{timeSlot.SlotNumber}节",
                 HorizontalAlignment = HorizontalAlignment.Center
-            };
-            
-            var textBlock2 = new TextBlock
+            });
+
+            panel.Children.Add(new TextBlock
             {
                 Text = timeSlot.StartTime.ToString("HH:mm"),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 FontSize = 10
-            };
-            
-            var textBlock3 = new TextBlock
+            });
+
+            panel.Children.Add(new TextBlock
             {
                 Text = timeSlot.EndTime.ToString("HH:mm"),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 FontSize = 10
-            };
-            
-            panel.Children.Add(textBlock1);
-            panel.Children.Add(textBlock2);
-            panel.Children.Add(textBlock3);
-            
+            });
+
             border.Child = panel;
-            
+
             Grid.SetRow(border, i);
             Grid.SetColumn(border, 0);
-            
+
             _courseGrid.Children.Add(border);
         }
-
-        // 添加基础网格线
+    }
+    
+    /// <summary>
+    /// 创建课表网格线
+    /// </summary>
+    private void CreateGridLines()
+    {
+        if (_viewModel == null || _courseGrid == null) return;
+        
         for (int row = 0; row < _viewModel.TimeSlots.Count; row++)
         {
             for (int col = 1; col <= 7; col++)
@@ -129,22 +219,45 @@ public partial class TableView : UserControl
                 {
                     BorderBrush = Brushes.Gray,
                     BorderThickness = new Thickness(0, 0, 1, 1),
-                    MinHeight = 50 // 使用最小高度而非固定高度
+                    MinHeight = 50
                 };
-                
+
                 Grid.SetRow(cell, row);
                 Grid.SetColumn(cell, col);
-                
+
                 _courseGrid.Children.Add(cell);
             }
         }
     }
 
+    /// <summary>
+    /// 显示课程卡片
+    /// </summary>
     private void DisplayCourses()
     {
-        if (_viewModel?.FilteredCourses == null) return;
+        if (_viewModel?.FilteredCourses == null || _courseGrid == null) return;
+        
+        try
+        {
+            // 清除现有课程卡片
+            RemoveExistingCourseCards();
 
-        // 清除现有课程卡片
+            // 添加新的课程卡片
+            AddCourseCards();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"显示课程时出错: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// 清除现有课程卡片
+    /// </summary>
+    private void RemoveExistingCourseCards()
+    {
+        if (_courseGrid == null) return;
+        
         for (int i = _courseGrid.Children.Count - 1; i >= 0; i--)
         {
             var child = _courseGrid.Children[i];
@@ -153,164 +266,248 @@ public partial class TableView : UserControl
                 _courseGrid.Children.RemoveAt(i);
             }
         }
-
-        // 添加课程卡片
+    }
+    
+    /// <summary>
+    /// 添加课程卡片到网格
+    /// </summary>
+    private void AddCourseCards()
+    {
+        if (_viewModel?.FilteredCourses == null || _courseGrid == null) return;
+        
         foreach (var course in _viewModel.FilteredCourses)
         {
             var dayIndex = GetDayColumn(course.Weekday);
             if (dayIndex > 0)
             {
-                // 为不同课程创建不同的颜色
-                var courseColor = GetCourseColor(course.CourseName);
-                var textColor = ShouldUseDarkText(courseColor) ? new SolidColorBrush(Colors.Black) : new SolidColorBrush(Colors.White);
-
                 // 创建课程卡片
-                var card = new Border
-                {
-                    Background = courseColor,
-                    BorderThickness = new Thickness(0),
-                    CornerRadius = new CornerRadius(4),
-                    Padding = new Thickness(6),
-                    Margin = new Thickness(3),
-                    Tag = "CourseCard",
-                    BoxShadow = new BoxShadows(new BoxShadow
-                    {
-                        OffsetX = 1,
-                        OffsetY = 1,
-                        Blur = 3,
-                        Spread = 0,
-                        Color = Color.FromArgb(40, 0, 0, 0)
-                    })
-                };
-
-                var panel = new StackPanel();
-
-                panel.Children.Add(new TextBlock
-                {
-                    Text = course.CourseName,
-                    FontWeight = FontWeight.Bold,
-                    TextWrapping = TextWrapping.Wrap,
-                    Foreground = textColor,
-                    Margin = new Thickness(0, 0, 0, 2)
-                });
-
-                if (!string.IsNullOrEmpty(course.Classroom))
-                {
-                    panel.Children.Add(new TextBlock
-                    {
-                        Text = course.Classroom,
-                        FontSize = 11,
-                        TextWrapping = TextWrapping.Wrap,
-                        Foreground = textColor,
-                        Opacity = 0.9
-                    });
-                }
-
-                if (!string.IsNullOrEmpty(course.Teacher))
-                {
-                    panel.Children.Add(new TextBlock
-                    {
-                        Text = course.Teacher,
-                        FontSize = 11,
-                        TextWrapping = TextWrapping.Wrap,
-                        Foreground = textColor,
-                        Opacity = 0.9
-                    });
-                }
-
-                card.Child = panel;
+                var courseCard = CreateCourseCard(course);
 
                 // 设置位置
-                Grid.SetColumn(card, dayIndex);
-                Grid.SetRow(card, course.StartSlot - 1);
-                Grid.SetRowSpan(card, course.EndSlot - course.StartSlot + 1);
+                Grid.SetColumn(courseCard, dayIndex);
+                Grid.SetRow(courseCard, course.StartSlot - 1);
+                Grid.SetRowSpan(courseCard, course.EndSlot - course.StartSlot + 1);
 
-                // 覆盖在网格上方
-                card.ZIndex = 1;
+                // 设置Z轴层级，确保覆盖在网格上方
+                courseCard.ZIndex = 1;
 
-                _courseGrid.Children.Add(card);
+                _courseGrid.Children.Add(courseCard);
             }
         }
     }
+
+    /// <summary>
+    /// 创建课程卡片
+    /// </summary>
+    /// <param name="course">课程信息</param>
+    /// <returns>表示课程的Border控件</returns>
+    private Border CreateCourseCard(Course course)
+    {
+        // 为不同课程创建不同的颜色
+        var courseColor = GetCourseColor(course.CourseName);
+        var textColor = ShouldUseDarkText(courseColor) ? 
+            new SolidColorBrush(Colors.Black) : new SolidColorBrush(Colors.White);
+
+        // 创建课程卡片
+        var card = new Border
+        {
+            Background = courseColor,
+            BorderThickness = new Thickness(0),
+            CornerRadius = new CornerRadius(4),
+            Padding = new Thickness(6),
+            Margin = new Thickness(3),
+            Tag = "CourseCard",
+            BoxShadow = new BoxShadows(new BoxShadow
+            {
+                OffsetX = 1,
+                OffsetY = 1,
+                Blur = 3,
+                Spread = 0,
+                Color = Color.FromArgb(40, 0, 0, 0)
+            })
+        };
+
+        var panel = CreateCourseCardContent(course, textColor);
+        card.Child = panel;
+
+        // 添加双击事件 - 打开课程详情
+        card.DoubleTapped += (_, _) => {
+            _viewModel?.OpenCourseCardCommand.Execute(course);
+        };
+
+        // 添加鼠标悬停效果
+        AddHoverEffects(card);
+
+        return card;
+    }
     
+    /// <summary>
+    /// 创建课程卡片内容
+    /// </summary>
+    private StackPanel CreateCourseCardContent(Course course, IBrush textColor)
+    {
+        var panel = new StackPanel();
+
+        // 课程名称
+        panel.Children.Add(new TextBlock
+        {
+            Text = course.CourseName,
+            FontWeight = FontWeight.Bold,
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = textColor,
+            Margin = new Thickness(0, 0, 0, 2)
+        });
+
+        // 教室
+        if (!string.IsNullOrEmpty(course.Classroom))
+        {
+            panel.Children.Add(new TextBlock
+            {
+                Text = course.Classroom,
+                FontSize = 11,
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = textColor,
+                Opacity = 0.9
+            });
+        }
+
+        // 教师
+        if (!string.IsNullOrEmpty(course.Teacher))
+        {
+            panel.Children.Add(new TextBlock
+            {
+                Text = course.Teacher,
+                FontSize = 11,
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = textColor,
+                Opacity = 0.9
+            });
+        }
+
+        return panel;
+    }
+    
+    /// <summary>
+    /// 为卡片添加悬停效果
+    /// </summary>
+    private static void AddHoverEffects(Border card)
+    {
+        card.PointerEntered += (_, _) => {
+            card.Opacity = 0.85;
+            card.Cursor = new Cursor(StandardCursorType.Hand);
+        };
+
+        card.PointerExited += (_, _) => {
+            card.Opacity = 1.0;
+            card.Cursor = Cursor.Default;
+        };
+    }
+
+    /// <summary>
+    /// 更新星期标题，包括周几和日期
+    /// </summary>
     private void UpdateWeekdayHeaders()
     {
         if (_viewModel == null) return;
 
-        var semesterStart = TableLayout.First;
-        var currentWeekFirstDay = semesterStart.AddDays((_viewModel.CurrentWeek - 1) * 7);
-
-        var tableGrid = this.FindControl<Grid>("TableGrid");
-        if (tableGrid == null) return;
-
-        var headerGrid = tableGrid.Children.FirstOrDefault() as Grid;
-        if (headerGrid == null) return;
-        
-        // // 从应用资源中获取前景色
-        // IBrush textBrush;
-        // if (this.TryFindResource("PrimaryForegroundBrush", this.ActualThemeVariant, out var res))
-        // {
-        //     textBrush = (SolidColorBrush) res;
-        // }
-        // else
-        // {
-        //     // 如果找不到资源，使用默认值
-        //     bool isDarkTheme = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
-        //     textBrush = new SolidColorBrush(isDarkTheme ? Colors.White : Colors.Black);
-        // }
-
-        // 遍历星期列
-        for (int i = 1; i <= 7; i++)
+        try
         {
-            var currentDate = currentWeekFirstDay.AddDays(i - 1);
+            var semesterStart = TableLayout.First;
+            var currentWeekFirstDay = semesterStart.AddDays((_viewModel.CurrentWeek - 1) * 7);
 
-            if (i < headerGrid.Children.Count)
+            var tableGrid = this.FindControl<Grid>("TableGrid");
+            if (tableGrid == null) return;
+
+            var headerGrid = tableGrid.Children.FirstOrDefault() as Grid;
+            if (headerGrid == null) return;
+
+            // 遍历星期列
+            for (int i = 1; i <= 7; i++)
             {
+                if (i >= headerGrid.Children.Count) continue;
+                
+                var currentDate = currentWeekFirstDay.AddDays(i - 1);
                 var border = headerGrid.Children[i] as Border;
-                if (border != null)
-                {
-                    // 设置通用表头样式
-                    border.Background = new SolidColorBrush(Colors.Transparent);
-                    border.BorderThickness = new Thickness(0, 0, 1, 1);
+                if (border == null) continue;
 
-                    var panel = new StackPanel
-                    {
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Margin = new Thickness(0, 4, 0, 4)
-                    };
-
-                    var dayOfWeek = (int)currentDate.DayOfWeek;
-                    if (dayOfWeek == 0) dayOfWeek = 7;
-
-                    // 使用你定义的前景色资源
-                    var weekdayText = new TextBlock
-                    {
-                        Text = GetWeekdayText(dayOfWeek),
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        FontWeight = FontWeight.Normal,
-                    };
-                    weekdayText.Bind(ForegroundProperty, Resources.GetResourceObservable("PrimaryForegroundBrush"));
-
-                    var dateText = new TextBlock
-                    {
-                        Text = currentDate.ToString("MM/dd"),
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        FontSize = 11,
-                        Opacity = 0.85,
-                        Margin = new Thickness(0, 2, 0, 0)
-                    };
-                    dateText.Bind(ForegroundProperty, Resources.GetResourceObservable("PrimaryForegroundBrush"));
-
-                    panel.Children.Add(weekdayText);
-                    panel.Children.Add(dateText);
-
-                    border.Child = panel;
-                }
+                UpdateWeekdayHeader(border, currentDate);
             }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"更新星期标题时出错: {ex.Message}");
         }
     }
     
+    /// <summary>
+    /// 更新单个星期标题
+    /// </summary>
+    private void UpdateWeekdayHeader(Border border, DateTime date)
+    {
+        // 设置通用表头样式
+        border.Background = new SolidColorBrush(Colors.Transparent);
+        border.BorderThickness = new Thickness(0, 0, 1, 1);
+
+        var panel = new StackPanel
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 4, 0, 4)
+        };
+
+        var dayOfWeek = (int)date.DayOfWeek;
+        if (dayOfWeek == 0) dayOfWeek = 7; // 将星期日从0改为7
+
+        // 创建星期文本
+        var weekdayText = new TextBlock
+        {
+            Text = GetWeekdayText(dayOfWeek),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            FontWeight = FontWeight.Normal
+        };
+
+        // 创建日期文本
+        var dateText = new TextBlock
+        {
+            Text = date.ToString("MM/dd"),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            FontSize = 11,
+            Opacity = 0.85,
+            Margin = new Thickness(0, 2, 0, 0)
+        };
+
+        // 尝试绑定前景色资源
+        try
+        {
+            var resource = Resources.GetResourceObservable("PrimaryForegroundBrush");
+            if (resource != null)
+            {
+                weekdayText.Bind(ForegroundProperty, resource);
+                dateText.Bind(ForegroundProperty, resource);
+            }
+            else
+            {
+                // 资源不存在，使用默认颜色
+                weekdayText.Foreground = new SolidColorBrush(Colors.Black);
+                dateText.Foreground = new SolidColorBrush(Colors.Black);
+            }
+        }
+        catch
+        {
+            // 绑定失败，使用默认颜色
+            weekdayText.Foreground = new SolidColorBrush(Colors.Black);
+            dateText.Foreground = new SolidColorBrush(Colors.Black);
+        }
+
+        panel.Children.Add(weekdayText);
+        panel.Children.Add(dateText);
+
+        border.Child = panel;
+    }
+
+    /// <summary>
+    /// 获取星期几的显示文本
+    /// </summary>
     private string GetWeekdayText(int column)
     {
         return column switch
@@ -326,6 +523,9 @@ public partial class TableView : UserControl
         };
     }
 
+    /// <summary>
+    /// 将星期文本转换为列索引
+    /// </summary>
     private int GetDayColumn(string weekday)
     {
         return weekday switch
@@ -340,8 +540,10 @@ public partial class TableView : UserControl
             _ => 0
         };
     }
-    
-    // 根据课程名生成唯一颜色
+
+    /// <summary>
+    /// 根据课程名获取唯一颜色
+    /// </summary>
     private SolidColorBrush GetCourseColor(string courseName)
     {
         var colors = new[]
@@ -354,30 +556,27 @@ public partial class TableView : UserControl
             GetResourceColor("HongwaGreenColor", "#00797C"),  // 黉瓦绿
         };
 
-        // 使用静态字典记录每个课程名对应的颜色索引
-        // 如果此为空，则为类的静态成员（需添加到类定义中）
+        // 初始化课程颜色索引字典
         if (_courseColorIndices == null)
         {
-            _courseColorIndices = new System.Collections.Generic.Dictionary<string, int>();
+            _courseColorIndices = new Dictionary<string, int>();
         }
 
-        // 查看该课程是否已分配颜色
+        // 为课程分配唯一颜色
         if (!_courseColorIndices.ContainsKey(courseName))
         {
-            // 如果没有分配，则分配下一个可用颜色索引
             int nextIndex = _courseColorIndices.Count % colors.Length;
             _courseColorIndices[courseName] = nextIndex;
         }
 
-        // 使用已分配的颜色索引
+        // 获取已分配的颜色
         int colorIndex = _courseColorIndices[courseName];
         return new SolidColorBrush(colors[colorIndex]);
     }
 
-    // 添加到类定义，用于记录课程颜色分配
-    private static System.Collections.Generic.Dictionary<string, int> _courseColorIndices;
-
-    // 辅助方法：获取资源颜色
+    /// <summary>
+    /// 从应用资源中获取颜色，如果获取失败则使用备用颜色
+    /// </summary>
     private Color GetResourceColor(string resourceKey, string fallback)
     {
         if (Application.Current?.Resources.TryGetResource(resourceKey, null, out var resource) == true)
@@ -395,7 +594,9 @@ public partial class TableView : UserControl
         return Color.Parse(fallback);
     }
 
-    // 辅助方法：判断背景色是否应该使用深色文本
+    /// <summary>
+    /// 判断背景色是否应该使用深色文本
+    /// </summary>
     private bool ShouldUseDarkText(IBrush background)
     {
         if (background is SolidColorBrush brush)

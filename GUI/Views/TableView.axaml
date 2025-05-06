@@ -22,7 +22,7 @@
       <Button Content="添加课程" Command="{Binding AddCourseCommand}"/>
     </StackPanel>
 
-    <!-- 课表内容区域 - 添加ScrollViewer -->
+    <!-- 课表内容区域 - 用ScrollViewer -->
     <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Margin="10">
       <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
         <Grid x:Name="TableGrid">
@@ -92,7 +92,7 @@
               <ColumnDefinition Width="*"/>
               <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <!-- 行定义会在代码中动态添加 -->
+            <!-- 行定义在代码中动态添加 -->
           </Grid>
         </Grid>
       </ScrollViewer>

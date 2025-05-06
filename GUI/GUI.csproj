@@ -33,4 +33,10 @@
     <ItemGroup>
       <Folder Include="Models\" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Views\CourseCardView.axaml.cs">
+        <DependentUpon>CourceCardView.axaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>
