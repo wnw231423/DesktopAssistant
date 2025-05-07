@@ -190,6 +190,33 @@ public class TableService
     // 课程资源存储的总文件夹
     private static string _courseResourseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "course");
     
+    // 创建课程资源文件夹, 每当用户添加一个课程, 则会添加一个课程资源文件夹
+    public void AddCourseResourceDir(string courseName)
+    {
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        
+        if (!Directory.Exists(courseResourceDir))
+        {
+            Directory.CreateDirectory(courseResourceDir);
+        }
+    }
+    
+    // 用户在gui会先创建类别, 然后再往类别里添加文件
+    public void AddResourceType(string courseName, string resourceType)
+    {
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        
+        var resourceTypeDir = Path.Combine(courseResourceDir, resourceType);
+        if (!Directory.Exists(resourceTypeDir))
+        {
+            Directory.CreateDirectory(resourceTypeDir);
+        }
+        else
+        {
+            throw new Exception($"资源类型 {resourceType} 已存在");
+        }
+    }
+    
     // 向课程资源文件夹中添加课程资源
     // 例如, 课程名称为"高等数学", 资源类型为"ppt", 文件路径为"C:\Users\user\Desktop\高数课件.zip"
     // 则将文件添加到 _courseResourceDir\高等数学\ppt\高数课件.zip
@@ -219,7 +246,14 @@ public class TableService
         throw new NotImplementedException();
     }
     
-    // 打开某资源
+    // 在文件资源管理器打开课程资源的文件夹
+    public void OpenCourseResourceDir(string courseName)
+    {
+        //TODO
+        throw new NotImplementedException();
+    }
+    
+    // 直接打开某资源
     public void OpenCourseResource(string courseName, string resourceType, string fileName)
     {
         // TODO

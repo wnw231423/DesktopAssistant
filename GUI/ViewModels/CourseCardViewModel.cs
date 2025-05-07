@@ -23,7 +23,10 @@ public partial class CourseCardViewModel : ObservableObject
     public string EditButtonText => IsEditing ? "完成" : "编辑";
 
     public ObservableCollection<string> WeekdayOptions { get; }
+    public int MaxSlot { get; } = TableLayout.TimeSlots.Count;
+    
     private readonly TableService _tableService = new TableService();
+    
 
     public CourseCardViewModel(Course course)
     {
@@ -44,7 +47,7 @@ public partial class CourseCardViewModel : ObservableObject
         if (IsEditing)
         {
             // 如果当前是编辑模式，切换到非编辑模式
-            SaveChanges();
+            IsEditing = false;
         }
         else
         {
@@ -52,8 +55,6 @@ public partial class CourseCardViewModel : ObservableObject
             _originalCourse = CloneCourse(Course);
             IsEditing = true;
         }
-
-        OnPropertyChanged(nameof(EditButtonText));
     }
 
     [RelayCommand]
@@ -61,8 +62,10 @@ public partial class CourseCardViewModel : ObservableObject
     {
         _tableService.UpdateCourse(Course);
         IsEditing = false;
-        OnPropertyChanged(nameof(EditButtonText));
-
+        // 为了触发UI更新，需要重新赋值Course
+        var updatedCourse = CloneCourse(Course);
+        Course = updatedCourse;
+        
         // 通知ResourcesViewModel课程可能已更改
         ResourcesViewModel.Course = Course;
     }
@@ -73,7 +76,6 @@ public partial class CourseCardViewModel : ObservableObject
         // 恢复原始值
         Course = CloneCourse(_originalCourse);
         IsEditing = false;
-        OnPropertyChanged(nameof(EditButtonText));
     }
 
     private Course CloneCourse(Course source)
@@ -91,11 +93,5 @@ public partial class CourseCardViewModel : ObservableObject
         {
             Id = source.Id
         };
-    }
-    
-    // 无参构造函数，用于设计时支持
-    public CourseCardViewModel()
-        : this(new Course("示例课程", "1-16", "周一", 1, 2, "A101", "张教授"))
-    {
     }
 }

@@ -1,7 +1,4 @@
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using GUI.ViewModels;
 
 namespace GUI.Views;
 
@@ -12,11 +9,23 @@ public partial class CourseCardView : UserControl
         InitializeComponent();
     }
     
-    public void SetCourse(Data.Models.Table.Course course)
+    private void OnStartSlotChanged(object? sender, NumericUpDownValueChangedEventArgs e)
     {
-        if (DataContext is CourseCardViewModel viewModel)
+        if (!e.NewValue.HasValue) return;
+        var endSlot = this.FindControl<NumericUpDown>("EndSlotInput");
+        if (endSlot != null)
         {
-            viewModel.Course = course;
+            endSlot.Minimum = (decimal)e.NewValue;
+        }
+    }
+
+    private void OnEndSlotChanged(object? sender, NumericUpDownValueChangedEventArgs e)
+    {
+        if (!e.NewValue.HasValue) return;
+        var startSlot = this.FindControl<NumericUpDown>("StartSlotInput");
+        if (startSlot != null)
+        {
+            startSlot.Maximum = (decimal)e.NewValue;
         }
     }
 }

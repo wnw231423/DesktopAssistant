@@ -8,120 +8,291 @@
              x:Class="GUI.Views.CourseCardView"
              x:DataType="vm:CourseCardViewModel">
 
+    <UserControl.Resources>
+        <!-- 定义字体大小资源 -->
+        <x:Double x:Key="TitleFontSize">24</x:Double>
+        <x:Double x:Key="NormalFontSize">15</x:Double>
+        <x:Double x:Key="SmallFontSize">14</x:Double>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <!-- 标题文本样式 -->
+        <Style Selector="TextBlock.Title">
+            <Setter Property="FontSize" Value="{StaticResource TitleFontSize}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,20"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}"/>
+        </Style>
+
+        <!-- 标签文本样式 -->
+        <Style Selector="TextBlock.Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,6,0,6"/>
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}"/>
+            <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+        </Style>
+
+        <!-- 内容边框样式 -->
+        <Style Selector="Border.ContentBorder">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,4,0,6"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <!-- 内容文本样式 -->
+        <Style Selector="TextBlock.Content">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}"/>
+            <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+        </Style>
+
+        <!-- 输入框样式 -->
+        <Style Selector="TextBox">
+            <Setter Property="Margin" Value="0,4,0,6"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}"/>
+            <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+        </Style>
+
+        <!-- 下拉框样式 -->
+        <Style Selector="ComboBox">
+            <Setter Property="Margin" Value="0,4,0,6"/>
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}"/>
+            <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+        </Style>
+
+        <!-- 数字输入框样式 -->
+        <Style Selector="NumericUpDown">
+            <Setter Property="Margin" Value="8,0"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}"/>
+            <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
+            <Setter Property="ShowButtonSpinner" Value="True"/>
+            <Setter Property="AllowSpin" Value="True"/>
+            <Setter Property="ButtonSpinnerLocation" Value="Right"/>
+            <Setter Property="ClipValueToMinMax" Value="True"/>
+            <Setter Property="FormatString" Value="0"/>
+            <Setter Property="Increment" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- 按钮基本样式 -->
+        <Style Selector="Button">
+            <Setter Property="Margin" Value="6,0"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryAccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="{StaticResource SmallFontSize}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.9"/>
+            <Setter Property="RenderTransform" Value="scale(1.02)"/>
+        </Style>
+
+        <!-- 功能按钮样式 -->
+        <Style Selector="Button.Edit">
+            <Setter Property="Background" Value="{DynamicResource InfoBrush}"/>
+        </Style>
+
+        <Style Selector="Button.Save">
+            <Setter Property="Background" Value="{DynamicResource SuccessBrush}"/>
+        </Style>
+
+        <Style Selector="Button.Cancel">
+            <Setter Property="Background" Value="{DynamicResource ErrorBrush}"/>
+        </Style>
+    </UserControl.Styles>
+
     <Grid RowDefinitions="Auto,*">
         <!-- 课程基本信息卡片 -->
-        <Border Grid.Row="0" 
-                BorderThickness="1" 
-                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                CornerRadius="8" 
-                Padding="20" 
+        <Border Grid.Row="0"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource BorderBrush}"
+                CornerRadius="12"
+                Padding="20 15"
                 Margin="0,0,0,15"
-                Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="150,*">
+                Background="{DynamicResource CardBackgroundBrush}"
+                BoxShadow="0 4 16 0 #30000000">
+            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="25*,75*">
                 <!-- 标题 -->
                 <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
-                           Text="课程信息"
-                           FontSize="20" 
-                           FontWeight="Bold"
-                           Margin="0,0,0,15"/>
-                
+                           Classes="Title"
+                           Text="课程信息"/>
+
                 <!-- 课程名称 -->
                 <TextBlock Grid.Row="1" Grid.Column="0"
-                           Text="课程名称："
-                           VerticalAlignment="Center"
-                           Margin="0,5"/>
-                <TextBox Grid.Row="1" Grid.Column="1"
-                         Text="{Binding Course.CourseName}"
-                         Margin="0,5"
-                         IsReadOnly="{Binding !IsEditing}"/>
-                
+                           Classes="Label"
+                           Text="课程名称："/>
+                <Panel Grid.Row="1" Grid.Column="1">
+                    <Border Classes="ContentBorder"
+                            IsVisible="{Binding !IsEditing}">
+                        <TextBlock Classes="Content"
+                                   Text="{Binding Course.CourseName}"/>
+                    </Border>
+                    <TextBox Text="{Binding Course.CourseName}"
+                             IsVisible="{Binding IsEditing}"/>
+                </Panel>
+
                 <!-- 周次范围 -->
                 <TextBlock Grid.Row="2" Grid.Column="0"
-                           Text="周次范围："
-                           VerticalAlignment="Center"
-                           Margin="0,5"/>
-                <TextBox Grid.Row="2" Grid.Column="1"
-                         Text="{Binding Course.WeekRange}"
-                         Margin="0,5"
-                         IsReadOnly="{Binding !IsEditing}"/>
-                
+                           Classes="Label"
+                           Text="周次范围："/>
+                <Panel Grid.Row="2" Grid.Column="1">
+                    <Border Classes="ContentBorder"
+                            IsVisible="{Binding !IsEditing}">
+                        <TextBlock Classes="Content"
+                                   Text="{Binding Course.WeekRange}"/>
+                    </Border>
+                    <TextBox Text="{Binding Course.WeekRange}"
+                             IsVisible="{Binding IsEditing}"/>
+                </Panel>
+
                 <!-- 星期和时间 -->
                 <TextBlock Grid.Row="3" Grid.Column="0"
-                           Text="上课时间："
-                           VerticalAlignment="Center"
-                           Margin="0,5"/>
-                <Grid Grid.Row="3" Grid.Column="1" ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+                           Classes="Label"
+                           Text="上课时间："/>
+
+                <!-- 非编辑模式显示 -->
+                <Border Grid.Row="3" Grid.Column="1"
+                        Classes="ContentBorder"
+                        IsVisible="{Binding !IsEditing}">
+                    <StackPanel Orientation="Horizontal"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Course.Weekday}"
+                                   Classes="Content"/>
+                        <TextBlock Text="第 "
+                                   Classes="Content"
+                                   Margin="4,0"/>
+                        <TextBlock Text="{Binding Course.StartSlot}"
+                                   Classes="Content"
+                                   Margin="4, 0"/>
+                        <TextBlock Text=" - "
+                                   Classes="Content"
+                                   Margin="4,0"/>
+                        <TextBlock Text="{Binding Course.EndSlot}"
+                                   Classes="Content"
+                                   Margin="4, 0"/>
+                        <TextBlock Text=" 节"
+                                   Classes="Content"
+                                   Margin="4,0,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 编辑模式显示 -->
+                <Grid Grid.Row="3" Grid.Column="1"
+                      ColumnDefinitions="20*,Auto,20*,Auto,20*,Auto"
+                      IsVisible="{Binding IsEditing}"
+                      Margin="0,4,0,6">
                     <ComboBox Grid.Column="0"
                               ItemsSource="{Binding WeekdayOptions}"
                               SelectedItem="{Binding Course.Weekday}"
-                              IsEnabled="{Binding IsEditing}"
-                              Margin="0,5,5,5"/>
-                    <TextBlock Grid.Column="1" 
-                               Text="第" 
+                              HorizontalAlignment="Stretch"/>
+                    <TextBlock Grid.Column="1"
+                               Text="第"
                                VerticalAlignment="Center"
-                               Margin="5,0"/>
+                               Margin="8,0,4,0"
+                               FontSize="{StaticResource NormalFontSize}"/>
                     <NumericUpDown Grid.Column="2"
-                                  Value="{Binding Course.StartSlot}"
-                                  Minimum="1"
-                                  Maximum="12"
-                                  IsEnabled="{Binding IsEditing}"
-                                  Width="70"/>
-                    <TextBlock Grid.Column="3" 
-                               Text="-" 
+                                   Name="StartSlotInput"
+                                   Value="{Binding Course.StartSlot}"
+                                   Minimum="1"
+                                   Maximum="{Binding Course.EndSlot}"
+                                   ValueChanged="OnStartSlotChanged"
+                                   FormatString="0"
+                                   Increment="1"/>
+                    <TextBlock Grid.Column="3"
+                               Text="-"
                                VerticalAlignment="Center"
-                               Margin="5,0"/>
+                               Margin="4"
+                               FontSize="{StaticResource NormalFontSize}"/>
                     <NumericUpDown Grid.Column="4"
-                                  Value="{Binding Course.EndSlot}"
-                                  Minimum="1"
-                                  Maximum="12"
-                                  IsEnabled="{Binding IsEditing}"
-                                  Width="70"/>
+                                   Name="EndSlotInput"
+                                   Value="{Binding Course.EndSlot}"
+                                   Minimum="{Binding Course.StartSlot}"
+                                   Maximum="{Binding MaxSlot}"
+                                   ValueChanged="OnEndSlotChanged"
+                                   FormatString="0"
+                                   Increment="1"/>
+                    <TextBlock Grid.Column="5"
+                               Text="节"
+                               VerticalAlignment="Center"
+                               Margin="4,0,0,0"
+                               FontSize="{StaticResource NormalFontSize}"/>
                 </Grid>
-                
+
                 <!-- 教室 -->
                 <TextBlock Grid.Row="4" Grid.Column="0"
-                           Text="教室："
-                           VerticalAlignment="Center"
-                           Margin="0,5"/>
-                <TextBox Grid.Row="4" Grid.Column="1"
-                         Text="{Binding Course.Classroom}"
-                         Margin="0,5"
-                         IsReadOnly="{Binding !IsEditing}"/>
-                
+                           Classes="Label"
+                           Text="教室："/>
+                <Panel Grid.Row="4" Grid.Column="1">
+                    <Border Classes="ContentBorder"
+                            IsVisible="{Binding !IsEditing}">
+                        <TextBlock Classes="Content"
+                                   Text="{Binding Course.Classroom}"/>
+                    </Border>
+                    <TextBox Text="{Binding Course.Classroom}"
+                             IsVisible="{Binding IsEditing}"/>
+                </Panel>
+
                 <!-- 教师 -->
                 <TextBlock Grid.Row="5" Grid.Column="0"
-                           Text="授课教师："
-                           VerticalAlignment="Center"
-                           Margin="0,5"/>
-                <TextBox Grid.Row="5" Grid.Column="1"
-                         Text="{Binding Course.Teacher}"
-                         Margin="0,5"
-                         IsReadOnly="{Binding !IsEditing}"/>
+                           Classes="Label"
+                           Text="授课教师："/>
+                <Panel Grid.Row="5" Grid.Column="1">
+                    <Border Classes="ContentBorder"
+                            IsVisible="{Binding !IsEditing}">
+                        <TextBlock Classes="Content"
+                                   Text="{Binding Course.Teacher}"/>
+                    </Border>
+                    <TextBox Text="{Binding Course.Teacher}"
+                             IsVisible="{Binding IsEditing}"/>
+                </Panel>
             </Grid>
         </Border>
-        
+
         <!-- 操作按钮 -->
-        <StackPanel Grid.Row="0" 
-                   Orientation="Horizontal" 
-                   HorizontalAlignment="Right" 
-                   VerticalAlignment="Bottom"
-                   Margin="0,0,20,0">
-            <Button Content="{Binding EditButtonText}"
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="0,15,15,0">
+            <Button Classes="Edit"
+                    Content="编辑"
                     Command="{Binding ToggleEditModeCommand}"
-                    Margin="5"/>
-            <Button Content="保存"
+                    IsVisible="{Binding !IsEditing}"/>
+            <Button Classes="Save"
+                    Content="保存"
                     Command="{Binding SaveChangesCommand}"
-                    IsVisible="{Binding IsEditing}"
-                    Margin="5"/>
-            <Button Content="取消"
+                    IsVisible="{Binding IsEditing}"/>
+            <Button Classes="Cancel"
+                    Content="取消"
                     Command="{Binding CancelEditingCommand}"
-                    IsVisible="{Binding IsEditing}"
-                    Margin="5"/>
+                    IsVisible="{Binding IsEditing}"/>
         </StackPanel>
-        
+
         <!-- 课程资源 -->
-        <views:ResourcesView Grid.Row="1" 
-                            DataContext="{Binding ResourcesViewModel}"
-                            Margin="0,10,0,0"/>
+        <views:ResourcesView Grid.Row="1"
+                             DataContext="{Binding ResourcesViewModel}"
+                             Margin="0,10,0,0"/>
     </Grid>
 </UserControl>

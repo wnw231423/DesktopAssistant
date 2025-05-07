@@ -277,7 +277,7 @@ public partial class TableView : UserControl
         
         foreach (var course in _viewModel.FilteredCourses)
         {
-            var dayIndex = GetDayColumn(course.Weekday);
+            var dayIndex = GetDayColumn(course.Weekday) + 1; // +1是因为第0列是时间节次列
             if (dayIndex > 0)
             {
                 // 创建课程卡片
@@ -456,7 +456,6 @@ public partial class TableView : UserControl
         };
 
         var dayOfWeek = (int)date.DayOfWeek;
-        if (dayOfWeek == 0) dayOfWeek = 7; // 将星期日从0改为7
 
         // 创建星期文本
         var weekdayText = new TextBlock
@@ -512,6 +511,7 @@ public partial class TableView : UserControl
     {
         return column switch
         {
+            0 => "周日",
             1 => "周一",
             2 => "周二",
             3 => "周三",
@@ -530,13 +530,13 @@ public partial class TableView : UserControl
     {
         return weekday switch
         {
+            "周日" => 0,
             "周一" => 1,
             "周二" => 2,
             "周三" => 3,
             "周四" => 4,
             "周五" => 5,
             "周六" => 6,
-            "周日" => 7,
             _ => 0
         };
     }
