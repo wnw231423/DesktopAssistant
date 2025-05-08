@@ -40,6 +40,4 @@ public class Course
         TimeOnly endTime = Data.Models.Table.TableLayout.TimeSlots[endSlot - 1].EndTime;
         return $"{startTime:HH:mm}-{endTime:HH:mm}";
     }
-
-
 }

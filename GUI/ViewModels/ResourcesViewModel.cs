@@ -57,6 +57,7 @@ namespace GUI.ViewModels
                     });
                 }
                 
+                // TODO: 这里是添加测试数据， 后面
                 // 如果没有资源，添加一些默认分组
                 if (ResourceGroups.Count == 0)
                 {
