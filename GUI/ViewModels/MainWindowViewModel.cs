@@ -22,6 +22,7 @@ namespace GUI.ViewModels
         private bool _isDarkTheme;
         
         private TableViewModel _tableViewModel;
+        private ConfigViewModel _configViewModel;
 
         public MainWindowViewModel()
         {
@@ -33,6 +34,7 @@ namespace GUI.ViewModels
             }
             
             _tableViewModel = new TableViewModel(new TableService());
+            _configViewModel = new ConfigViewModel();
 
             // 默认导航到课表页面
             Navigate("Table");
@@ -54,7 +56,7 @@ namespace GUI.ViewModels
                     break;
                 case "Settings":
                     // 稍后实现
-                    CurrentView = new PlaceholderView("设置页面开发中");
+                    CurrentView = _configViewModel;
                     break;
                 default:
                     CurrentView = _tableViewModel;

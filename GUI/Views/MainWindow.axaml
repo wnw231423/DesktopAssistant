@@ -91,11 +91,16 @@
                     </Grid.RowDefinitions>
 
                     <!-- 应用Logo -->
-                    <TextBlock Text="武"
-                               FontSize="24" FontWeight="Bold"
-                               Foreground="{DynamicResource PrimaryAccentBrush}"
-                               HorizontalAlignment="Center"
-                               Margin="0,16,0,24"/>
+                    <!-- 应用Logo -->
+                    <Button Background="Transparent" BorderThickness="0"
+                            HorizontalAlignment="Center" 
+                            Margin="0,16,0,24"
+                            DoubleTapped = "ShowDailyReport">
+                        <TextBlock Text="武"
+                                   FontSize="24" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryAccentBrush}"/>
+                        <ToolTip.Tip>双击打开日报窗口</ToolTip.Tip>
+                    </Button>
 
                     <!-- 导航按钮 -->
                     <StackPanel Grid.Row="1">

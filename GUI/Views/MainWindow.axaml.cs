@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Core.Table;
 using GUI.ViewModels;
 
@@ -28,5 +29,11 @@ public partial class MainWindow : Window
                 }
             };
         }
+    }
+    
+    private void ShowDailyReport(object sender, TappedEventArgs e)
+    {
+        var dailyReport = new DailyReportWindow();
+        dailyReport.ShowDialog(this);
     }
 }
