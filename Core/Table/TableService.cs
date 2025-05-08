@@ -216,47 +216,95 @@ public class TableService
             throw new Exception($"资源类型 {resourceType} 已存在");
         }
     }
-    
+
     // 向课程资源文件夹中添加课程资源
     // 例如, 课程名称为"高等数学", 资源类型为"ppt", 文件路径为"C:\Users\user\Desktop\高数课件.zip"
     // 则将文件添加到 _courseResourceDir\高等数学\ppt\高数课件.zip
     public void AddCourseResource(string courseName, string resourceType, string filePath)
     {
-        // 需要注意是否已有同名文件, 有则需要报错
-        
-        // TODO
-        throw new NotImplementedException();
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        var resourceTypeDir = Path.Combine(courseResourceDir, resourceType);
+        if (!Directory.Exists(resourceTypeDir))
+        {
+            Directory.CreateDirectory(resourceTypeDir);
+        }
+        string fileName = Path.GetFileName(filePath);
+        string targetFilePath = Path.Combine(resourceTypeDir, fileName);
+        if (File.Exists(targetFilePath))
+        {
+            throw new Exception($"文件{fileName}已存在");
+        }
+        File.Copy(filePath, targetFilePath);
     }
-    
+
     // 读取某个课程的所有课程资源
     public List<ResourceInfo> GetCourseResources(string courseName)
     {
-        // TODO
-        throw new NotImplementedException();
+        var resources = new List<ResourceInfo>();
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        if (!Directory.Exists(courseResourceDir))
+        {
+            return resources;
+        }
+        foreach (var resourceTypeDir in Directory.GetDirectories(courseResourceDir))
+        {
+            string resourceType = Path.GetFileName(resourceTypeDir);
+            foreach (var file in Directory.GetFiles(resourceTypeDir))
+            {
+                string fileName = Path.GetFileName(file);
+                FileInfo fileInfo = new FileInfo(file);
+                resources.Add(new ResourceInfo
+                {
+                    ResourceName = fileName,
+                    ResourcePath = file,
+                    ResourceType = resourceType,
+                    LastModified = fileInfo.LastWriteTime
+                });
+            }
+        }
+        return resources;
     }
-    
+
     // 删除课程资源
     // 例如, 课程名称为"高等数学", 资源类型为"ppt", 文件名为"高数课件.zip"
     // 则删除 _courseResourceDir\高等数学\ppt\高数课件.zip
     public void DeleteCourseResource(string courseName, string resourceType, string fileName)
     {
-        // 如果文件不存在, 直接return即可
-        
-        // TODO
-        throw new NotImplementedException();
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        var resourceTypeDir = Path.Combine(courseResourceDir, resourceType);
+        string targetFilePath = Path.Combine(resourceTypeDir, fileName);
+        if (File.Exists(targetFilePath))
+        {
+            File.Delete(targetFilePath);
+        }
     }
-    
+
     // 在文件资源管理器打开课程资源的文件夹
     public void OpenCourseResourceDir(string courseName)
     {
-        //TODO
-        throw new NotImplementedException();
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        if (Directory.Exists(courseResourceDir))
+        {
+            System.Diagnostics.Process.Start("explorer.exe", courseResourceDir);
+        }
+        else
+        {
+            throw new Exception("文件不存在");
+        }
     }
-    
     // 直接打开某资源
     public void OpenCourseResource(string courseName, string resourceType, string fileName)
     {
-        // TODO
-        throw new NotImplementedException();
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        var resourceTypeDir = Path.Combine(courseResourceDir, resourceType);
+        string targetFilePath = Path.Combine(resourceTypeDir, fileName);
+        if (File.Exists(targetFilePath))
+        {
+            System.Diagnostics.Process.Start(targetFilePath);
+        }
+        else
+        {
+            throw new Exception("文件不存在");
+        }
     }
 }
