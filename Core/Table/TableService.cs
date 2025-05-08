@@ -17,7 +17,7 @@ public class TableService
     public List<Course> GetCoursesByDate(DateTime date)
     {
         // 计算是第几周
-        int daysDiff = (int)(date - Data.Models.Table.TableLayout.First).TotalDays;
+        int daysDiff = (int)(date - TableLayout.First).TotalDays;
         int weekNumber = daysDiff < 0 ? 0 : (daysDiff / 7) + 1;
         
         // 获取星期几
