@@ -1,0 +1,168 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:GUI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="600"
+             x:Class="GUI.Views.AddCourseView"
+             x:DataType="vm:AddCourseViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.Label">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+        
+        <Style Selector="TextBox">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        
+        <Style Selector="ComboBox">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        
+        <Style Selector="NumericUpDown">
+            <Setter Property="Margin" Value="0,0,0,5"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        
+        <Style Selector="Button">
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Border Background="{DynamicResource CardBackgroundBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            BoxShadow="0 2 8 0 #20000000">
+            
+        <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+            <TextBlock Grid.Row="0"
+                       Text="添加课程"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource PrimaryAccentBrush}"
+                       Margin="0,10,0,20"/>
+
+            <ScrollViewer Grid.Row="1" Padding="5,0">
+                <StackPanel Spacing="15">
+                    <!-- 课程名称 -->
+                    <StackPanel>
+                        <TextBlock Text="课程名称" Classes="Label"/>
+                        <TextBox Text="{Binding CourseName}" 
+                                 Watermark="请输入课程名称"
+                                 BorderBrush="{DynamicResource BorderBrush}"/>
+                    </StackPanel>
+
+                    <!-- 周次范围 -->
+                    <StackPanel>
+                        <TextBlock Text="周次范围" Classes="Label"/>
+                        <TextBox Text="{Binding WeekRange}" 
+                                 Watermark="例如：1-8,10,12-16（留空表示全部周次）"
+                                 BorderBrush="{DynamicResource BorderBrush}"/>
+                    </StackPanel>
+
+                    <!-- 星期几 -->
+                    <StackPanel>
+                        <TextBlock Text="星期几" Classes="Label"/>
+                        <ComboBox SelectedIndex="{Binding SelectedWeekdayIndex}" 
+                                  Width="200" 
+                                  HorizontalAlignment="Left"
+                                  BorderBrush="{DynamicResource BorderBrush}">
+                            <ComboBoxItem>星期一</ComboBoxItem>
+                            <ComboBoxItem>星期二</ComboBoxItem>
+                            <ComboBoxItem>星期三</ComboBoxItem>
+                            <ComboBoxItem>星期四</ComboBoxItem>
+                            <ComboBoxItem>星期五</ComboBoxItem>
+                            <ComboBoxItem>星期六</ComboBoxItem>
+                            <ComboBoxItem>星期日</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- 开始和结束节次 - 并排 -->
+                    <Grid ColumnDefinitions="*,*" Margin="0,0,0,5">
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="开始节次" Classes="Label"/>
+                            <NumericUpDown Value="{Binding StartSlot}" 
+                                          Minimum="1" 
+                                          Maximum="{Binding MaxSlot}" 
+                                          BorderBrush="{DynamicResource BorderBrush}"
+                                          HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                            <TextBlock Text="结束节次" Classes="Label"/>
+                            <NumericUpDown Value="{Binding EndSlot}" 
+                                          Minimum="1" 
+                                          Maximum="{Binding MaxSlot}" 
+                                          BorderBrush="{DynamicResource BorderBrush}"
+                                          HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 教室和教师 - 并排 -->
+                    <Grid ColumnDefinitions="*,*" Margin="0,0,0,10">
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="教室" Classes="Label"/>
+                            <TextBox Text="{Binding Classroom}" 
+                                     Watermark="请输入教室"
+                                     BorderBrush="{DynamicResource BorderBrush}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                            <TextBlock Text="教师" Classes="Label"/>
+                            <TextBox Text="{Binding Teacher}" 
+                                     Watermark="请输入教师姓名"
+                                     BorderBrush="{DynamicResource BorderBrush}"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- 课程预览 -->
+                    <Border BorderBrush="{DynamicResource BorderBrush}" 
+                            BorderThickness="1" 
+                            CornerRadius="4"
+                            Padding="12" 
+                            Margin="0,5,0,0"
+                            Background="{DynamicResource SecondaryBackgroundBrush}">
+                        <StackPanel>
+                            <TextBlock Text="课程预览" 
+                                      FontWeight="Bold" 
+                                      Margin="0,0,0,8"
+                                      Foreground="{DynamicResource SecondaryAccentBrush}"/>
+                            <TextBlock Text="{Binding CoursePreview}" 
+                                      TextWrapping="Wrap"
+                                      Foreground="{DynamicResource PrimaryForegroundBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- 底部按钮 -->
+            <Grid Grid.Row="2" 
+                 ColumnDefinitions="*,*" 
+                 Margin="0,20,0,0"
+                 HorizontalAlignment="Stretch">
+                <Button Grid.Column="0"
+                        Content="取消" 
+                        Command="{Binding CancelCommand}" 
+                        HorizontalAlignment="Center"
+                        Width="100"
+                        Margin="5,0"/>
+                <Button Grid.Column="1"
+                        Content="添加" 
+                        Command="{Binding AddCourseCommand}" 
+                        HorizontalAlignment="Center"
+                        Width="100"
+                        Background="{DynamicResource PrimaryAccentBrush}"
+                        Foreground="White"
+                        Margin="5,0"/>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>
