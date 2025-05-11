@@ -38,5 +38,9 @@
       <Compile Update="Views\CourseCardView.axaml.cs">
         <DependentUpon>CourceCardView.axaml</DependentUpon>
       </Compile>
+      <Compile Update="Views\ResourcesMainView.axaml.cs">
+        <DependentUpon>ResourcesMainView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>

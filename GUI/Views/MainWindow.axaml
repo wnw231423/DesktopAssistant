@@ -113,6 +113,14 @@
                         </Button>
                         
                         <Button Classes="NavButton"
+                                Tag="{Binding SelectedPageTag, Converter={StaticResource EqualityConverter}, ConverterParameter=Table}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Resources">
+                            <TextBlock Text="R"/>
+                            <ToolTip.Tip>课程资源</ToolTip.Tip>
+                        </Button>
+                        
+                        <Button Classes="NavButton"
                                 Tag="{Binding SelectedPageTag, Converter={StaticResource EqualityConverter}, ConverterParameter=Todo}"
                                 Command="{Binding NavigateCommand}"
                                 CommandParameter="Todo">

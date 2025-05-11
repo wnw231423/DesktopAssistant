@@ -20,9 +20,6 @@ namespace GUI.ViewModels
 
         [ObservableProperty]
         private bool _isDarkTheme;
-        
-        private TableViewModel _tableViewModel;
-        private ConfigViewModel _configViewModel;
 
         public MainWindowViewModel()
         {
@@ -32,9 +29,6 @@ namespace GUI.ViewModels
             {
                 IsDarkTheme = true;
             }
-            
-            _tableViewModel = new TableViewModel(new TableService());
-            _configViewModel = new ConfigViewModel();
 
             // 默认导航到课表页面
             Navigate("Table");
@@ -48,18 +42,19 @@ namespace GUI.ViewModels
             switch (destination)
             {
                 case "Table":
-                    CurrentView = _tableViewModel;
+                    CurrentView = new TableViewModel(new TableService());
+                    break;
+                case "Resources":
+                    CurrentView = new ResourcesMainViewModel();
                     break;
                 case "Todo":
-                    // 稍后实现
                     CurrentView = new PlaceholderView("待办事项功能即将上线");
                     break;
                 case "Settings":
-                    // 稍后实现
-                    CurrentView = _configViewModel;
+                    CurrentView = new ConfigViewModel();
                     break;
                 default:
-                    CurrentView = _tableViewModel;
+                    CurrentView = new TableViewModel(new TableService());
                     break;
             }
         }
