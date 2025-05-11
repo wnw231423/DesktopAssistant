@@ -20,9 +20,15 @@ public class TodoService
         throw new NotImplementedException();
     }
     
-    //帮我根据TableService生成类似的代码框架
     // 获取今天的待办事项
     public List<TodoItem> GetTodaysTodoItems()
+    {
+        //TODO
+        throw new NotImplementedException();
+    }
+    
+    // 获取某一课程的待办事项
+    public List<TodoItem> GetCourseTodoItems(string courseName)
     {
         //TODO
         throw new NotImplementedException();
