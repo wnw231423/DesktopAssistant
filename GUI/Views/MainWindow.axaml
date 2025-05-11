@@ -89,8 +89,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
-                    <!-- 应用Logo -->
+                    
                     <!-- 应用Logo -->
                     <Button Background="Transparent" BorderThickness="0"
                             HorizontalAlignment="Center" 

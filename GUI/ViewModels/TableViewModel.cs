@@ -74,9 +74,32 @@ public partial class TableViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void AddCourse()
+    private async Task AddCourse()
     {
-        // TODO
+        // 创建窗口并设置AddCourseView作为内容
+        var addCourseView = new AddCourseView();
+    
+        var window = new Window
+        {
+            Title = "添加课程",
+            Content = addCourseView,
+            Width = 500,
+            Height = 600,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
+        };
+    
+        // 设置视图模型
+        addCourseView.DataContext = new AddCourseViewModel(_tableService, window);
+    
+        // 打开窗口
+        var mainWindow = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+            ? desktop.MainWindow
+            : null;
+    
+        await window.ShowDialog(mainWindow);
+    
+        // 关闭窗口后重新加载课程
+        LoadCourses();
     }
     
     [RelayCommand]

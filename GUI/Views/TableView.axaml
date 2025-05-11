@@ -19,7 +19,7 @@
       <TextBlock Text="{Binding CurrentWeek, StringFormat='第 {0} 周'}"
                  VerticalAlignment="Center" FontWeight="Bold"/>
       <Button Content="下一周" Command="{Binding NextWeekCommand}"/>
-      <Button Content="添加课程" Command="{Binding AddCourseCommand}"/>
+      <Button Content="添加课程" Command="{Binding AddCourse}"/>
     </StackPanel>
 
     <!-- 课表内容区域 - 用ScrollViewer -->

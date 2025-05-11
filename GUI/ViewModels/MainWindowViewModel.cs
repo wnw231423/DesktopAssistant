@@ -4,6 +4,7 @@ using Avalonia.Styling;
 using GUI.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.AI;
 using Core.Table;
 using Data.Models.Table;
 
@@ -32,6 +33,15 @@ namespace GUI.ViewModels
 
             // 默认导航到课表页面
             Navigate("Table");
+            
+            // 应用初始化, 应当放在别处, 目前放在这里
+            // TODO: 更改位置
+            InitalizeCommands();
+        }
+        
+        private void InitalizeCommands()
+        {
+            AiService.AiInit();
         }
 
         [RelayCommand]
