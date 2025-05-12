@@ -2,10 +2,15 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.Table;
 using Data.Models.Table;
+using Avalonia;
+using MsBox.Avalonia;
+using GUI.Views.Dialogs;
 
 namespace GUI.ViewModels
 {
@@ -58,10 +63,10 @@ namespace GUI.ViewModels
                 }
                 
                 // 如果没有资源，添加一些默认分组
-                if (ResourceGroups.Count == 0)
-                {
-                    AddMockData();
-                }
+                // if (ResourceGroups.Count == 0)
+                // {
+                //     AddMockData();
+                // }
             }
             catch (Exception ex)
             {
@@ -126,37 +131,217 @@ namespace GUI.ViewModels
         }
 
         [RelayCommand]
-        private void ToggleExpand(ResourceGroup group)
+        private void ToggleExpand(string typeName)
         {
+            var group = ResourceGroups.FirstOrDefault(g => g.TypeName == typeName);
             if (group != null)
             {
                 group.IsExpanded = !group.IsExpanded;
             }
         }
         
-        // 这些命令将来可以实现添加、打开、删除功能
         [RelayCommand]
-        private void AddResource(string resourceType)
+        private async Task AddResourceType()
         {
-            // 将来可以实现
+            // 创建输入对话框
+            var dialog = new TextInputDialog
+            {
+                Title = "添加资源类型",
+                Message = "请输入新的资源类型名称：",
+                PlaceholderText = "例如: 作业, 课件, 参考资料等"
+            };
+
+            // 获取当前窗口
+            var window = GetWindow();
+            if (window == null) return;
+
+            // 显示对话框并获取结果
+            var result = await dialog.ShowAsync(window);
+            
+            // 如果用户输入了类型名称
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                string newType = result.Trim();
+                
+                // 检查是否已存在该类型
+                if (ResourceGroups.Any(g => g.TypeName.Equals(newType, StringComparison.OrdinalIgnoreCase)))
+                {
+                    await MessageBoxManager.GetMessageBoxStandard(
+                        "提示", 
+                        $"资源类型 \"{newType}\" 已存在！", 
+                        MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
+                    return;
+                }
+                
+                // 创建资源组对应的文件夹
+                try
+                {
+                    var courseResourceDir = Path.Combine(_tableService.GetResourcesBasePath(), Course.CourseName);
+                    var resourceTypeDir = Path.Combine(courseResourceDir, newType);
+                    
+                    if (!Directory.Exists(courseResourceDir))
+                    {
+                        Directory.CreateDirectory(courseResourceDir);
+                    }
+                    
+                    if (!Directory.Exists(resourceTypeDir))
+                    {
+                        Directory.CreateDirectory(resourceTypeDir);
+                    }
+                    
+                    // 添加到UI
+                    ResourceGroups.Add(new ResourceGroup 
+                    { 
+                        TypeName = newType, 
+                        IsExpanded = true,
+                        Resources = new ObservableCollection<ResourceInfo>()
+                    });
+                }
+                catch (Exception ex)
+                {
+                    await MessageBoxManager.GetMessageBoxStandard(
+                        "错误", 
+                        $"创建资源类型失败：{ex.Message}", 
+                        MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
+                }
+            }
         }
-        
+
+        [RelayCommand]
+        private async Task AddResource(string resourceType)
+        {
+            var resourceGroup = ResourceGroups.FirstOrDefault(g => g.TypeName == resourceType);
+            if (resourceGroup == null) return;
+
+            // 打开文件对话框
+            var dialog = new OpenFileDialog
+            {
+                Title = $"选择要添加到 {resourceType} 的文件",
+                AllowMultiple = true
+            };
+
+            var window = GetWindow();
+            if (window == null) return;
+
+            // 获取用户选择的文件
+            var result = await dialog.ShowAsync(window);
+            
+            if (result != null && result.Length > 0)
+            {
+                foreach (var filePath in result)
+                {
+                    try
+                    {
+                        // 使用TableService添加资源
+                        _tableService.AddCourseResource(Course.CourseName, resourceType, filePath);
+                        
+                        // 获取文件信息
+                        var fileInfo = new FileInfo(filePath);
+                        string fileName = Path.GetFileName(filePath);
+                        
+                        // 构建目标路径
+                        var targetPath = Path.Combine(
+                            _tableService.GetResourcesBasePath(),
+                            Course.CourseName,
+                            resourceType,
+                            fileName);
+                        
+                        // 添加到资源列表
+                        var resource = new ResourceInfo
+                        {
+                            ResourceName = fileName,
+                            ResourcePath = targetPath,
+                            ResourceType = resourceType,
+                            LastModified = fileInfo.LastWriteTime
+                        };
+                        
+                        // 更新UI
+                        resourceGroup.Resources.Add(resource);
+                        
+                        // 确保资源组按最后修改日期排序
+                        var sortedResources = new ObservableCollection<ResourceInfo>(
+                            resourceGroup.Resources.OrderByDescending(r => r.LastModified));
+                        resourceGroup.Resources = sortedResources;
+                    }
+                    catch (Exception ex)
+                    {
+                        await MessageBoxManager.GetMessageBoxStandard(
+                            "错误", 
+                            $"添加资源失败：{ex.Message}", 
+                            MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
+                    }
+                }
+            }
+        }
+
         [RelayCommand]
         private void OpenResource(ResourceInfo resource)
         {
-            // 将来可以实现
+            if (resource == null) return;
+            
+            try
+            {
+                // 使用TableService打开资源
+                _tableService.OpenCourseResource(
+                    Course.CourseName,
+                    resource.ResourceType,
+                    resource.ResourceName);
+            }
+            catch (Exception ex)
+            {
+                MessageBoxManager.GetMessageBoxStandard(
+                    "错误", 
+                    $"打开资源失败：{ex.Message}", 
+                    MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
+            }
         }
-        
+
         [RelayCommand]
-        private void DeleteResource(ResourceInfo resource)
+        private async Task DeleteResource(ResourceInfo resource)
         {
-            // 将来可以实现
+            if (resource == null) return;
+            
+            // 确认删除
+            var result = await MessageBoxManager.GetMessageBoxStandard(
+                "确认删除", 
+                $"确定要删除资源 \"{resource.ResourceName}\" 吗？", 
+                MsBox.Avalonia.Enums.ButtonEnum.YesNo).ShowAsync();
+            
+            if (result == MsBox.Avalonia.Enums.ButtonResult.Yes)
+            {
+                try
+                {
+                    // 使用TableService删除资源
+                    _tableService.DeleteCourseResource(
+                        Course.CourseName,
+                        resource.ResourceType,
+                        resource.ResourceName);
+                    
+                    // 从UI中移除
+                    var group = ResourceGroups.FirstOrDefault(g => g.TypeName == resource.ResourceType);
+                    if (group != null)
+                    {
+                        group.Resources.Remove(resource);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await MessageBoxManager.GetMessageBoxStandard(
+                        "错误", 
+                        $"删除资源失败：{ex.Message}", 
+                        MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
+                }
+            }
         }
-        
-        [RelayCommand]
-        private void AddResourceType()
+
+        // 辅助方法：获取当前窗口
+        private Window GetWindow()
         {
-            // 将来可以实现
+            if (Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                return desktop.MainWindow;
+            }
+            return null;
         }
     }
     

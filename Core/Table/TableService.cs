@@ -292,6 +292,7 @@ public class TableService
             throw new Exception("文件不存在");
         }
     }
+    
     // 直接打开某资源
     public void OpenCourseResource(string courseName, string resourceType, string fileName)
     {
@@ -306,6 +307,11 @@ public class TableService
         {
             throw new Exception("文件不存在");
         }
+    }
+    
+    public string GetResourcesBasePath()
+    {
+        return _courseResourseDir;
     }
     
     // 将课程信息导出为一个json文件

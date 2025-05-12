@@ -3,8 +3,74 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:GUI.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:views="using:GUI.Views"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
              x:Class="GUI.Views.ResourcesMainView"
              x:DataType="vm:ResourcesMainViewModel">
-    Welcome to Avalonia!
+
+    <UserControl.Styles>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Margin" Value="0,2" />
+        </Style>
+
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource PrimaryAccentBrush}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- 标题栏 -->
+        <TextBlock Grid.Row="0"
+                   Text="课程资源管理"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Margin="15,10"
+                   Foreground="{DynamicResource PrimaryAccentBrush}"/>
+
+        <!-- 主体内容 - 分割视图 -->
+        <Grid Grid.Row="1" ColumnDefinitions="250,*">
+            <!-- 左侧课程列表 -->
+            <Border Grid.Column="0"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Margin="5">
+                <Grid RowDefinitions="Auto,*">
+                    <TextBlock Grid.Row="0"
+                               Text="课程列表"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Margin="10" />
+
+                    <ListBox Grid.Row="1"
+                             ItemsSource="{Binding Courses}"
+                             SelectedItem="{Binding SelectedCourse}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Margin="5">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding CourseName}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- 右侧资源视图 -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Margin="5">
+                <views:ResourcesView DataContext="{Binding ResourceViewModel}" />
+            </Border>
+        </Grid>
+    </Grid>
 </UserControl>

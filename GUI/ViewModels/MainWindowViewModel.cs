@@ -13,7 +13,7 @@ namespace GUI.ViewModels
     public partial class MainWindowViewModel : ObservableObject
     {
         [ObservableProperty]
-        // Should change to ViewModelBase when no place holder
+        // Should change to ViewModelBase when no placeholder
         private Object _currentView;
 
         [ObservableProperty]
@@ -55,7 +55,7 @@ namespace GUI.ViewModels
                     CurrentView = new TableViewModel(new TableService());
                     break;
                 case "Resources":
-                    CurrentView = new ResourcesMainViewModel();
+                    CurrentView = new ResourcesMainViewModel(new TableService());
                     break;
                 case "Todo":
                     CurrentView = new PlaceholderView("待办事项功能即将上线");
