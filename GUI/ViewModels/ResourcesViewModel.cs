@@ -43,30 +43,31 @@ namespace GUI.ViewModels
             
             try
             {
-                // 获取课程所有资源
-                var resources = _tableService.GetCourseResources(Course.CourseName);
-                
-                // 按资源类型分组
-                var groupedResources = resources
-                    .GroupBy(r => r.ResourceType)
-                    .OrderBy(g => g.Key);
-                
-                foreach (var group in groupedResources)
+                // 获取课程所有类型
+                var resources = _tableService.GetCourseResourceTypes(Course.CourseName);
+                // 遍历每个资源类型
+                foreach (var resourceType in resources)
                 {
-                    ResourceGroups.Add(new ResourceGroup
+                    // 创建资源组
+                    var resourceGroup = new ResourceGroup
                     {
-                        TypeName = group.Key,
+                        TypeName = resourceType,
                         IsExpanded = true,
-                        Resources = new ObservableCollection<ResourceInfo>(
-                            group.OrderByDescending(r => r.LastModified))
-                    });
+                        Resources = new ObservableCollection<ResourceInfo>()
+                    };
+                    
+                    // 获取该类型下的所有资源
+                    var resourceInfos = _tableService.GetCourseResources(Course.CourseName, resourceType);
+                    
+                    // 添加到资源组
+                    foreach (var resourceInfo in resourceInfos)
+                    {
+                        resourceGroup.Resources.Add(resourceInfo);
+                    }
+                    
+                    // 添加到UI
+                    ResourceGroups.Add(resourceGroup);
                 }
-                
-                // 如果没有资源，添加一些默认分组
-                // if (ResourceGroups.Count == 0)
-                // {
-                //     AddMockData();
-                // }
             }
             catch (Exception ex)
             {
@@ -131,9 +132,8 @@ namespace GUI.ViewModels
         }
 
         [RelayCommand]
-        private void ToggleExpand(string typeName)
+        private void ToggleExpand(ResourceGroup group)
         {
-            var group = ResourceGroups.FirstOrDefault(g => g.TypeName == typeName);
             if (group != null)
             {
                 group.IsExpanded = !group.IsExpanded;
