@@ -89,8 +89,7 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
-                    <!-- 应用Logo -->
+                    
                     <!-- 应用Logo -->
                     <Button Background="Transparent" BorderThickness="0"
                             HorizontalAlignment="Center" 
@@ -110,6 +109,14 @@
                                 CommandParameter="Table">
                             <TextBlock Text="📚"/>
                             <ToolTip.Tip>课程表</ToolTip.Tip>
+                        </Button>
+                        
+                        <Button Classes="NavButton"
+                                Tag="{Binding SelectedPageTag, Converter={StaticResource EqualityConverter}, ConverterParameter=Table}"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="Resources">
+                            <TextBlock Text="R"/>
+                            <ToolTip.Tip>课程资源</ToolTip.Tip>
                         </Button>
                         
                         <Button Classes="NavButton"

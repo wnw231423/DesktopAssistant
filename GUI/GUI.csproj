@@ -23,6 +23,7 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
+        <PackageReference Include="MessageBox.Avalonia" Version="3.2.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -37,6 +38,10 @@
     <ItemGroup>
       <Compile Update="Views\CourseCardView.axaml.cs">
         <DependentUpon>CourceCardView.axaml</DependentUpon>
+      </Compile>
+      <Compile Update="Views\ResourcesMainView.axaml.cs">
+        <DependentUpon>ResourcesMainView.axaml</DependentUpon>
+        <SubType>Code</SubType>
       </Compile>
     </ItemGroup>
 </Project>
