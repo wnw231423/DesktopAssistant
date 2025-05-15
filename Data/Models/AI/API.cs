@@ -27,15 +27,15 @@ namespace Data.Models.AI
             _secret_key = secret_key;
         }
 
-        public async Task AiAssistent(string inputlist)
+        public async Task<string> AiAssistent(string inputlist)
         {
             var accessToken = await GetAccessToken();
             if (string.IsNullOrEmpty(accessToken))
             {
-                Console.WriteLine("Failed to get access token");
-                return;
+                //Console.WriteLine("Failed to get access token");
+                return "Failed to get access token";
             }
-            await ChatLoop(accessToken, inputlist);
+            return await ChatLoop(accessToken, inputlist);
         }
 
         public async Task<string> GetAccessToken()
@@ -47,7 +47,7 @@ namespace Data.Models.AI
             return json["access_token"]?.ToString();
         }
 
-        public async Task ChatLoop(string accessToken,string inputlist)
+        public async Task<string> ChatLoop(string accessToken,string inputlist)
         {
             using var client = new HttpClient();
             client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -58,18 +58,18 @@ namespace Data.Models.AI
             var input1 = "今天是几号";
             var response1 = await SendChatRequest(client, accessToken, input1);
             var answer1 = ParseResponse(response1);
-            Console.WriteLine($"{answer1}");
+            //Console.WriteLine($"{answer1}");
 
-            var input2 = "今天武汉市洪山区的天气怎么样,只说出实时气温和最高和最低气温和天气情况，后边不要附加其他东西";
+            var input2 = "今天武汉市洪山区的天气怎么样,只说出实时气温和最高和最低气温和天气情况，分行回答，后边不要附加其他东西";
             var response2 = await SendChatRequest(client, accessToken, input2);
             var answer2 = ParseResponse(response2);
-            Console.WriteLine($"{answer2}");
+            //Console.WriteLine($"{answer2}");
 
             var preinput = "然后请根据下面的内容简要概括出今天所需要干的事情，分点输出上午和下午和晚上要干的每个任务，如果有具体时间则一并输出任务的时间，不需要输出今天的日期，只输出任务。";
             var inputtodo = answer1 + preinput + inputlist;
             var responsetodo = await SendChatRequest(client, accessToken, inputtodo);
             var answertodo = ParseResponse(responsetodo);
-            Console.WriteLine("今天的任务是："+"\n"+$"{answertodo}");
+            //Console.WriteLine("今天的任务是："+"\n"+$"{answertodo}");
 
             /*while (true)
             {
@@ -85,6 +85,7 @@ namespace Data.Models.AI
 
                 Console.WriteLine($"AI：{answer}");
             }*/
+            return answer1 +"\n" + "\n" + answer2 + "\n" + "\n" + "今天的任务是：\n"  + answertodo+ "\n" + "\n" + "祝您度过元气满满的一天！";
         }
 
         public async Task<string> SendChatRequest(HttpClient client, string accessToken, string message)

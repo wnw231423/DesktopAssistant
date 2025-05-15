@@ -5,5 +5,30 @@
              xmlns:vm="using:GUI.ViewModels"
              x:Class="GUI.Views.ConfigView"
              x:DataType="vm:ConfigViewModel">
-    <TextBlock>This is config page</TextBlock>
+
+	<Design.DataContext>
+		<vm:ConfigViewModel />
+	</Design.DataContext>
+
+	<StackPanel Margin="20" Spacing="15">
+		<TextBlock Text="配置AI的API"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Foreground="Black"
+                   HorizontalAlignment="Center"/>
+		
+		<TextBox Watermark="请输入API_KEY"
+                 Text="{Binding Input1, Mode=TwoWay}"
+                 UseFloatingWatermark="True"/>
+
+		<TextBox Watermark="请输入SECRET_KEY"
+                 Text="{Binding Input2, Mode=TwoWay}"
+                 UseFloatingWatermark="True"/>
+
+		<Button Content="保存配置"
+                Command="{Binding ConfirmCommand}"
+                HorizontalAlignment="Center"
+                Padding="25 5"
+                FontWeight="Bold"/>
+	</StackPanel>
 </UserControl>
