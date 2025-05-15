@@ -1,5 +1,6 @@
 ﻿using Data.Models;
 using Data.Models.Table;
+using Newtonsoft.Json;
 
 namespace Core.Table;
 
@@ -313,22 +314,35 @@ public class TableService
     {
         return _courseResourseDir;
     }
-    
+
     // 将课程信息导出为一个json文件
     public void ExportCoursesToJson(string filePath)
     {
-        // 注意ID不需要导出, 因为ID是数据库自动生成的.
-        
-        // TODO
-        throw new NotImplementedException();
+        List<Course> courses = GetCourses();
+        var settings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore
+        };
+        string json = JsonConvert.SerializeObject(courses, settings);
+        File.WriteAllText(filePath, json);
     }
-    
+
     // 将课程信息导入
     public void ImportCoursesFromJson(string filePath)
     {
-        // 注意复用前面写过的AddCourse.
-        
-        // TODO
-        throw new NotImplementedException();
+        try
+        {
+            string jsonContent = File.ReadAllText(filePath);
+            List<Course> courses = JsonSerializer.Deserialize<List<Course>>(jsonContent);
+            foreach (var course in courses)
+            {
+                AddCourse(course);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"导入课程失败{ex.Message}");
+        }
     }
 }
