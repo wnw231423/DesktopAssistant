@@ -38,14 +38,14 @@ public class TodoService
     {
        var today = DateTime.Today;
         var items = GetTodoItems();
-        return items.Where(item => item.DueDate.Date == today.Date).ToList(); 
+        return items.Where(item => item.EndTime == today.Date).ToList(); 
     }
     
     // 获取某一课程的待办事项
     public List<TodoItem> GetCourseTodoItems(string courseName)
     {
         var items = GetTodoItems();
-        return items.Where(item => item.CourseName == courseName).ToList();
+        return items.Where(item => item.CourseTag == courseName).ToList();
     }
     
     // 添加待办事项

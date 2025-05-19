@@ -53,6 +53,8 @@ public class TableService
             using var context = new DaContext();
             context.Courses.Add(course);
             context.SaveChanges();
+            // 添加课程资源文件夹
+            AddCourseResourceDir(course.CourseName);
         }
         catch (Exception ex)
         {
@@ -72,6 +74,12 @@ public class TableService
                 context.Courses.Remove(course);
                 context.SaveChanges();
             }
+            // 删除课程资源文件夹
+            var courseResourceDir = Path.Combine(_courseResourseDir, course.CourseName);
+            if (Directory.Exists(courseResourceDir))
+            {
+                Directory.Delete(courseResourceDir, true);
+            }
         }
         catch (Exception ex)
         {
@@ -82,8 +90,24 @@ public class TableService
     // 更新课程
     public void UpdateCourse(Course course)
     {
+        // 更新课程资源文件夹名字
+        var oldCourseResourceDir = Path.Combine(_courseResourseDir, GetCourseById(course.Id).CourseName);
+        var newCourseResourceDir = Path.Combine(_courseResourseDir, course.CourseName);
+        if (Directory.Exists(oldCourseResourceDir))
+        {
+            Directory.Move(oldCourseResourceDir, newCourseResourceDir);
+        }
+        
+        // 更新数据库
         RemoveCourse(course.Id);
         AddCourse(course);
+    }
+    
+    // 根据ID获取课程
+    public Course GetCourseById(int id)
+    {
+        using var context = new DaContext();
+        return context.Courses.Find(id);
     }
     
     // 清空course表
@@ -192,7 +216,7 @@ public class TableService
     private static string _courseResourseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "course");
     
     // 创建课程资源文件夹, 每当用户添加一个课程, 则会添加一个课程资源文件夹
-    public void AddCourseResourceDir(string courseName)
+    private void AddCourseResourceDir(string courseName)
     {
         var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
         
@@ -334,7 +358,7 @@ public class TableService
         try
         {
             string jsonContent = File.ReadAllText(filePath);
-            List<Course> courses = JsonSerializer.Deserialize<List<Course>>(jsonContent);
+            List<Course> courses = JsonConvert.DeserializeObject<List<Course>>(jsonContent);
             foreach (var course in courses)
             {
                 AddCourse(course);
