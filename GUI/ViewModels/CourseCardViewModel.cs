@@ -1,10 +1,18 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Layout;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.Table;
 using Data.Models.Table;
+using GUI.Views;
+using MsBox.Avalonia;
 
 namespace GUI.ViewModels;
 
@@ -27,6 +35,7 @@ public partial class CourseCardViewModel : ObservableObject
     
     private readonly TableService _tableService = new TableService();
     
+    public event EventHandler CloseRequest;
 
     public CourseCardViewModel(Course course)
     {
@@ -77,7 +86,28 @@ public partial class CourseCardViewModel : ObservableObject
         Course = CloneCourse(_originalCourse);
         IsEditing = false;
     }
-
+    
+    [RelayCommand]
+    private async Task DeleteCourse()
+    {
+        var dialog = new EnsureDialogView(new EnsureDialogViewModel(
+                "删除确认", 
+                $"确定要删除课程{Course.CourseName}吗？此操作不可撤销。",
+            "删除",
+            "取消"
+        ));
+    
+        var mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+        var result = await dialog.ShowDialog<bool>(mainWindow);
+    
+        if (result)
+        {
+            // 用户确认删除
+            _tableService.RemoveCourse(Course.Id);
+            CloseRequest?.Invoke(this, EventArgs.Empty);
+        }
+    }
+    
     private Course CloneCourse(Course source)
     {
         // 创建课程对象的深拷贝

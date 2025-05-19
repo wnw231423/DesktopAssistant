@@ -74,7 +74,7 @@ public partial class TableViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private async Task AddCourse()
+    public async Task AddCourse()
     {
         // 创建窗口并设置AddCourseView作为内容
         var addCourseView = new AddCourseView();

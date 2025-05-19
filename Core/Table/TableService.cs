@@ -73,12 +73,12 @@ public class TableService
             {
                 context.Courses.Remove(course);
                 context.SaveChanges();
-            }
-            // 删除课程资源文件夹
-            var courseResourceDir = Path.Combine(_courseResourseDir, course.CourseName);
-            if (Directory.Exists(courseResourceDir))
-            {
-                Directory.Delete(courseResourceDir, true);
+                // 删除课程资源文件夹
+                var courseResourceDir = Path.Combine(_courseResourseDir, course.CourseName);
+                if (Directory.Exists(courseResourceDir))
+                {
+                    Directory.Delete(courseResourceDir, true);
+                }
             }
         }
         catch (Exception ex)
@@ -110,12 +110,22 @@ public class TableService
         return context.Courses.Find(id);
     }
     
-    // 清空course表
+    // 清空course
     public void ClearCourses()
     {
         using var context = new DaContext();
         context.Courses.RemoveRange(context.Courses);
         context.SaveChanges();
+        
+        // 删除课程资源文件夹下的所有课程资源
+        if (Directory.Exists(_courseResourseDir))
+        {
+            Directory.Delete(_courseResourseDir, true);
+        }
+        
+        // 重新创建课程资源文件夹
+        Directory.CreateDirectory(_courseResourseDir);
+        
     }
     
     /****************/
@@ -158,17 +168,10 @@ public class TableService
             new Course("数据结构", "11-13", "周四", 1, 2, "A402", "赵教授")
         };
 
-        using var context = new DaContext();
         foreach (var course in courses)
         {
-            if (!context.Courses.Any(c => c.CourseName == course.CourseName &&
-                                          c.Weekday == course.Weekday))
-            {
-                context.Courses.Add(course);
-            }
+            AddCourse(course);
         }
-
-        context.SaveChanges();
     }
     
     // 获取当前是第几周
