@@ -261,9 +261,23 @@ public class TableService
         }
         File.Copy(filePath, targetFilePath);
     }
+    
+    // 获取课程资源类型
+    public List<string> GetCourseResourceTypes(string courseName)
+    {
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        if (!Directory.Exists(courseResourceDir))
+        {
+            return new List<string>();
+        }
+        var resourceTypes = Directory.GetDirectories(courseResourceDir)
+            .Select(Path.GetFileName)
+            .ToList();
+        return resourceTypes;
+    }
 
-    // 读取某个课程的所有课程资源
-    public List<ResourceInfo> GetCourseResources(string courseName)
+    // 读取某个课程, 某个类型下的所有课程资源
+    public List<ResourceInfo> GetCourseResources(string courseName, string resourceType)
     {
         var resources = new List<ResourceInfo>();
         var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
@@ -271,22 +285,21 @@ public class TableService
         {
             return resources;
         }
-        foreach (var resourceTypeDir in Directory.GetDirectories(courseResourceDir))
+        
+        var resourceTypeDir = Path.Combine(courseResourceDir, resourceType);
+        foreach (var file in Directory.GetFiles(resourceTypeDir))
         {
-            string resourceType = Path.GetFileName(resourceTypeDir);
-            foreach (var file in Directory.GetFiles(resourceTypeDir))
+            string fileName = Path.GetFileName(file);
+            FileInfo fileInfo = new FileInfo(file);
+            resources.Add(new ResourceInfo
             {
-                string fileName = Path.GetFileName(file);
-                FileInfo fileInfo = new FileInfo(file);
-                resources.Add(new ResourceInfo
-                {
-                    ResourceName = fileName,
-                    ResourcePath = file,
-                    ResourceType = resourceType,
-                    LastModified = fileInfo.LastWriteTime
-                });
-            }
+                ResourceName = fileName,
+                ResourcePath = file,
+                ResourceType = resourceType,
+                LastModified = fileInfo.LastWriteTime
+            });
         }
+        
         return resources;
     }
 
