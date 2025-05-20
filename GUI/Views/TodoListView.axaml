@@ -1,0 +1,200 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:GUI.ViewModels"
+             xmlns:converters="using:GUI.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="GUI.Views.TodoListView"
+             x:DataType="vm:TodoListViewModel">
+
+    <UserControl.Resources>
+        <converters:MultiValueTodoTimeConverter x:Key="TodoTimeConverter"/>
+        <converters:BoolToTextDecorationConverter x:Key="BoolToTextDecorationConverter"/>
+        <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
+        <converters:BoolToArrowConverter x:Key="BoolToArrowConverter"/>
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="Auto, *, Auto, Auto, Auto">
+        <!-- 顶部控制区 -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto, Auto" Margin="0,0,0,10">
+            <ComboBox Grid.Column="0"
+                      HorizontalAlignment="Left"
+                      ItemsSource="{Binding SortOptions}"
+                      SelectedItem="{Binding SelectedSortOption}"
+                      Width="120"
+                      Margin="0,0,10,0"/>
+
+            <ComboBox Grid.Column="1"
+                      HorizontalAlignment="Left"
+                      ItemsSource="{Binding ViewModes}"
+                      SelectedItem="{Binding SelectedViewMode}"
+                      Width="120"
+                      Margin="0,0,10,0"
+                      IsVisible="{Binding !IsCourseSpecified}"/>
+
+            <CheckBox Grid.Column="2"
+                      Content="显示已完成任务"
+                      IsChecked="{Binding ShowCompletedTasks}"/>
+        </Grid>
+
+        <!-- 主体任务列表 -->
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding TodoItems}" Name="TodoItemsList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,4"
+                                Padding="8"
+                                BorderThickness="1"
+                                BorderBrush="{Binding IsDone, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#AAAAAA|#DDDDDD'}"
+                                CornerRadius="4">
+                            <Grid ColumnDefinitions="Auto, *, Auto">
+                                <!-- 完成状态 CheckBox -->
+                                <CheckBox Grid.Column="0"
+                                          IsChecked="{Binding IsDone, Mode=OneTime}"
+                                          Command="{Binding $parent[UserControl].((vm:TodoListViewModel)DataContext).ToggleItemStatusCommand}"
+                                          CommandParameter="{Binding}"/>
+
+                                <!-- 任务内容 -->
+                                <StackPanel Grid.Column="1" Margin="5,0">
+                                    <!-- 使用可编辑的TextBox -->
+                                    <TextBox Text="{Binding Content}"
+                                             BorderThickness="0"
+                                             Background="Transparent"
+                                             Padding="0"
+                                             FontWeight="SemiBold"
+                                             Foreground="{Binding IsDone, Converter={StaticResource BoolToColorConverter}, ConverterParameter='Black|Gray'}"
+                                             LostFocus="ContentEditor_LostFocus">
+                                        <TextBox.Styles>
+                                            <Style Selector="TextBox:focus">
+                                                <Setter Property="BorderThickness" Value="1"/>
+                                                <Setter Property="Background" Value="White"/>
+                                                <Setter Property="Foreground" Value="Black"/>
+                                            </Style>
+                                        </TextBox.Styles>
+                                    </TextBox>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                        <!-- 课程标签 -->
+                                        <Border CornerRadius="4"
+                                                Padding="4,2"
+                                                Background="#5072A7"
+                                                IsVisible="{Binding CourseTag, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                            <TextBlock Text="{Binding CourseTag}"
+                                                       Foreground="White"
+                                                       FontSize="11"/>
+                                        </Border>
+
+                                        <!-- 时间信息 -->
+                                        <TextBlock Margin="5,0,0,0"
+                                                   FontSize="11"
+                                                   Foreground="Gray">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource TodoTimeConverter}">
+                                                    <Binding Path="StartTime"/>
+                                                    <Binding Path="EndTime"/>
+                                                    <Binding Path="IsLongTerm"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- 删除按钮 -->
+                                <Button Grid.Column="2"
+                                        Padding="8,4"
+                                        Command="{Binding $parent[UserControl].((vm:TodoListViewModel)DataContext).DeleteItemCommand}"
+                                        CommandParameter="{Binding}">
+                                    <PathIcon Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
+                                              Width="16"
+                                              Height="16"
+                                              Foreground="Red"/>
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- 简单添加区域 -->
+        <Grid Grid.Row="2"
+              ColumnDefinitions="*, Auto, Auto"
+              Margin="0,10,0,0">
+            <TextBox Grid.Column="0"
+                     Text="{Binding NewItemContent}"
+                     Watermark="添加新待办事项..."
+                     x:Name="NewItemTextBox"
+                     KeyDown="OnAddItemKeyDown"/>
+
+            <Button Grid.Column="1"
+                    Command="{Binding AddItemCommand}"
+                    Margin="5,0,0,0"
+                    Padding="12,8">
+                <PathIcon Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
+                          Width="16"
+                          Height="16"/>
+            </Button>
+
+            <Button Grid.Column="2"
+                    Command="{Binding ToggleDetailedAddModeCommand}"
+                    Margin="5,0,0,0"
+                    Padding="12,8">
+                <PathIcon Data="{Binding IsDetailedAddMode, Converter={StaticResource BoolToArrowConverter}}"
+                          Width="16"
+                          Height="16"/>
+            </Button>
+        </Grid>
+
+        <!-- 详细添加区域 -->
+        <Grid Grid.Row="3"
+              IsVisible="{Binding IsDetailedAddMode}"
+              Margin="0,10,0,0"
+              RowDefinitions="Auto,Auto">
+
+            <!-- 日期选择行 -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="Auto,*,Auto,*"
+                  Margin="0,5">
+                <TextBlock Grid.Column="0"
+                           Text="开始时间:"
+                           VerticalAlignment="Center"
+                           Margin="0,0,5,0"/>
+                <DatePicker Grid.Column="1"
+                            SelectedDate="{Binding StartTime}"/>
+
+                <TextBlock Grid.Column="2"
+                           Text="结束时间:"
+                           VerticalAlignment="Center"
+                           Margin="10,0,5,0"
+                           IsEnabled="{Binding !IsLongTerm}"/>
+                <DatePicker Grid.Column="3"
+                            SelectedDate="{Binding EndTime}"
+                            IsEnabled="{Binding !IsLongTerm}"/>
+            </Grid>
+
+            <!-- 长期任务和课程标签行 -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="Auto,*,Auto,*"
+                  Margin="0,5">
+                <CheckBox Grid.Column="0"
+                          Content="长期任务"
+                          IsChecked="{Binding IsLongTerm}"/>
+
+                <TextBlock Grid.Column="2"
+                           Text="课程标签:"
+                           VerticalAlignment="Center"
+                           Margin="10,0,5,0"
+                           IsVisible="{Binding !IsCourseSpecified}"/>
+                <ComboBox Grid.Column="3"
+                          ItemsSource="{Binding AvailableCourses}"
+                          SelectedItem="{Binding CourseTag}"
+                          IsVisible="{Binding !IsCourseSpecified}"/>
+            </Grid>
+        </Grid>
+        
+        <Grid Grid.Row="4">
+            <Label>Hello</Label>
+        </Grid>
+    </Grid>
+</UserControl>

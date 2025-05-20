@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.AI;
 using Core.Table;
+using Core.Todo;
 using Data.Models.Table;
 
 namespace GUI.ViewModels
@@ -57,7 +58,7 @@ namespace GUI.ViewModels
                     CurrentView = new ResourcesMainViewModel(new TableService());
                     break;
                 case "Todo":
-                    CurrentView = new PlaceholderView("待办事项功能即将上线");
+                    CurrentView = new TodoListViewModel(new TodoService());
                     break;
                 case "Settings":
                     CurrentView = new ConfigViewModel();

@@ -23,7 +23,10 @@ namespace GUI.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<ResourceGroup> _resourceGroups;
-
+        
+        [ObservableProperty]
+        private bool _isEditMode;
+        
         public ResourcesViewModel(TableService tableService, Course course)
         {
             _tableService = tableService;
@@ -34,6 +37,14 @@ namespace GUI.ViewModels
             
             // 加载资源
             LoadResources();
+
+            IsEditMode = false;
+        }
+        
+        [RelayCommand]
+        private void ToggleEditMode()
+        {
+            IsEditMode = !IsEditMode;
         }
 
         private void LoadResources()
@@ -275,23 +286,43 @@ namespace GUI.ViewModels
         }
 
         [RelayCommand]
-        private void OpenResource(ResourceInfo resource)
+        private async Task OpenResource(ResourceInfo resource)
         {
             if (resource == null) return;
-            
+
             try
             {
-                // 使用TableService打开资源
-                _tableService.OpenCourseResource(
+                string filePath = Path.Combine(
+                    _tableService.GetResourcesBasePath(),
                     Course.CourseName,
                     resource.ResourceType,
                     resource.ResourceName);
+
+                // 检查文件是否存在
+                if (!File.Exists(filePath))
+                {
+                    await MessageBoxManager.GetMessageBoxStandard(
+                        "错误",
+                        $"找不到文件：{filePath}",
+                        MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
+                    return;
+                }
+
+                // 使用系统默认程序打开文件
+                var startInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true, // 使用shell执行，让系统选择合适的程序打开
+                    WorkingDirectory = Path.GetDirectoryName(filePath)
+                };
+
+                System.Diagnostics.Process.Start(startInfo);
             }
             catch (Exception ex)
             {
-                MessageBoxManager.GetMessageBoxStandard(
-                    "错误", 
-                    $"打开资源失败：{ex.Message}", 
+                await MessageBoxManager.GetMessageBoxStandard(
+                    "错误",
+                    $"打开资源失败：{ex.Message}",
                     MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
             }
         }
@@ -329,6 +360,41 @@ namespace GUI.ViewModels
                     await MessageBoxManager.GetMessageBoxStandard(
                         "错误", 
                         $"删除资源失败：{ex.Message}", 
+                        MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
+                }
+            }
+        }
+        
+        [RelayCommand]
+        private async Task DeleteResourceType(string typeName)
+        {
+            if (string.IsNullOrEmpty(typeName)) return;
+    
+            // 确认删除
+            var result = await MessageBoxManager.GetMessageBoxStandard(
+                "确认删除", 
+                $"确定要删除资源类型 \"{typeName}\" 及其所有资源吗？", 
+                MsBox.Avalonia.Enums.ButtonEnum.YesNo).ShowAsync();
+    
+            if (result == MsBox.Avalonia.Enums.ButtonResult.Yes)
+            {
+                try
+                {
+                    // 使用TableService删除资源类型
+                    _tableService.DeleteCourseResourceType(Course.CourseName, typeName);
+            
+                    // 从UI中移除
+                    var group = ResourceGroups.FirstOrDefault(g => g.TypeName == typeName);
+                    if (group != null)
+                    {
+                        ResourceGroups.Remove(group);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await MessageBoxManager.GetMessageBoxStandard(
+                        "错误", 
+                        $"删除资源类型失败：{ex.Message}", 
                         MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
                 }
             }

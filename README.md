@@ -11,7 +11,7 @@
   - [ ] Add Todo
   - [ ] Delete Todo
   - [ ] Edit Todo
-- [ ] Course Resources
-  - [ ] Add/Delete Resource type 
-  - [ ] Add/Delete Resource
-  - [ ] Open Resource
+- [x] Course Resources
+  - [x] Add/Delete Resource type 
+  - [x] Add/Delete Resource
+  - [x] Open Resource

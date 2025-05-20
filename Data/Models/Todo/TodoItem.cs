@@ -8,7 +8,7 @@ public class TodoItem
     public int Id {get; set;}  // 主键
     
     // 课程标签. 注意一个TodoItem可能是不带课程标签的普通todo, 也可能是带课程标签的todo.
-    public string CourseTag {get; set;}  
+    public string? CourseTag {get; set;}  
     
     // 待办事项内容
     public string Content { get; set; }
@@ -23,7 +23,7 @@ public class TodoItem
     public bool IsLongTerm { get; set; }
 
     // 是否被删除（逻辑删除，实际删除由前端或后端控制器处理）
-    public bool IsDeleted { get; set; } = false;
+    public bool IsDone { get; set; }
 
     // 构造函数
     public TodoItem(string content, DateTime startTime, DateTime? endTime = null, bool isLongTerm = false, string? courseTag = null)
@@ -33,11 +33,15 @@ public class TodoItem
         EndTime = endTime;
         IsLongTerm = isLongTerm;
         CourseTag = courseTag;
+        IsDone = false;
     }
 
     public override string ToString()
     {
+        string courseTagDisplay = string.IsNullOrEmpty(CourseTag) ? "无课程标签" : CourseTag;
         string endTimeDisplay = IsLongTerm ? "长期持续" : EndTime?.ToString("yyyy-MM-dd HH:mm") ?? "未设定";
-        return $"[{CourseTag ?? "无标签"}] {Content}（{StartTime:yyyy-MM-dd HH:mm} - {endTimeDisplay}）";
+        string statusDisplay = IsDone ? "[已完成] " : "";
+    
+        return $"{statusDisplay}[{courseTagDisplay}] {Content}（{StartTime:yyyy-MM-dd HH:mm} - {endTimeDisplay}）";
     }
 }

@@ -88,4 +88,22 @@ public class TodoService
         RemoveTodoItem(item.Id);
         AddTodoItem(item);
     }
+    
+    public TodoItem GetTodoItemById(int itemId)
+    {
+        using var context = new DaContext();
+        return context.TodoItems.Find(itemId);
+    }
+    
+    public TodoItem ToggleTodoItemStatus(int itemId, bool newStatus)
+    {
+        var item = GetTodoItemById(itemId);
+        if (item != null)
+        {
+            item.IsDone = newStatus;
+            UpdateTodoItem(item);
+            return item;
+        }
+        return null;
+    }
 }

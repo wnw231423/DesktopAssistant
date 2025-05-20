@@ -319,6 +319,16 @@ public class TableService
             File.Delete(targetFilePath);
         }
     }
+    
+    public void DeleteCourseResourceType(string courseName, string resourceType)
+    {
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        var resourceTypeDir = Path.Combine(courseResourceDir, resourceType);
+        if (Directory.Exists(resourceTypeDir))
+        {
+            Directory.Delete(resourceTypeDir, true);
+        }
+    }
 
     // 在文件资源管理器打开课程资源的文件夹
     public void OpenCourseResourceDir(string courseName)

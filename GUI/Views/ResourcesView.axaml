@@ -11,6 +11,7 @@
 
     <UserControl.Resources>
         <converters:BoolToArrowConverter x:Key="BoolToArrow"/>
+        <converters:BoolToStringConverter x:Key="BoolToString"/>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -18,16 +19,21 @@
     </UserControl.Styles>
 
     <Grid RowDefinitions="Auto,*">
-        <!-- 顶部标题 -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,10">
             <TextBlock Grid.Column="0"
                        Text="{Binding Course.CourseName, StringFormat='{}{0} - 课程资源'}"
                        FontSize="18" FontWeight="SemiBold"
                        VerticalAlignment="Center"/>
 
             <Button Grid.Column="1"
+                    Content="{Binding IsEditMode, Converter={StaticResource BoolToString}, ConverterParameter='取消|编辑'}"
+                    Command="{Binding ToggleEditModeCommand}"
+                    Margin="0,0,10,0"/>
+
+            <Button Grid.Column="2"
                     Content="添加新类型"
-                    Command="{Binding AddResourceTypeCommand}"/>
+                    Command="{Binding AddResourceTypeCommand}"
+                    IsVisible="{Binding !IsEditMode}"/>
         </Grid>
 
         <!-- 资源列表 -->
@@ -47,9 +53,8 @@
                             <StackPanel Margin="0,0,0,5">
                                 <!-- 资源类型标题 -->
                                 <Border Classes="group">
-                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                                         <!-- 箭头按钮 - 用于折叠/展开 -->
-                                        <!-- 箭头按钮 - 修正命令绑定 -->
                                         <Button Grid.Column="0"
                                                 Content="{Binding IsExpanded, Converter={StaticResource BoolToArrow}}"
                                                 Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).ToggleExpandCommand}"
@@ -61,14 +66,22 @@
                                                 VerticalAlignment="Center"/>
 
                                         <TextBlock Grid.Column="1"
-                                                 Text="{Binding TypeName}"
-                                                 FontWeight="SemiBold"
-                                                 VerticalAlignment="Center"/>
+                                                   Text="{Binding TypeName}"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"/>
 
                                         <Button Grid.Column="2"
                                                 Content="添加"
                                                 Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).AddResourceCommand}"
-                                                CommandParameter="{Binding TypeName}"/>
+                                                CommandParameter="{Binding TypeName}"
+                                                IsVisible="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).IsEditMode, Converter={x:Static BoolConverters.Not}}"/>
+
+                                        <Button Grid.Column="3"
+                                                Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).DeleteResourceTypeCommand}"
+                                                CommandParameter="{Binding TypeName}"
+                                                IsVisible="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).IsEditMode}">
+                                            <PathIcon Data="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8.46,11.88L9.87,10.47L12,12.59L14.12,10.47L15.53,11.88L13.41,14L15.53,16.12L14.12,17.53L12,15.41L9.88,17.53L8.47,16.12L10.59,14L8.46,11.88M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z"/>
+                                        </Button>
                                     </Grid>
                                 </Border>
 
@@ -82,6 +95,20 @@
                                                     <TextBlock Grid.Column="0"
                                                               Text="{Binding ResourceName}"
                                                               VerticalAlignment="Center" />
+
+                                                    <Button Grid.Column="1"
+                                                            Command="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).OpenResourceCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            Content="打开"
+                                                            IsVisible="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).IsEditMode, Converter={x:Static BoolConverters.Not}}"
+                                                            Margin="5,0,0,0"/>
+
+                                                    <Button Grid.Column="2"
+                                                            Command="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).DeleteResourceCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            IsVisible="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).IsEditMode}">
+                                                        <PathIcon Data="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M9,3V4H15V3H9M14,17V11H16V17H14M10,17V11H12V17H10Z"/>
+                                                    </Button>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
