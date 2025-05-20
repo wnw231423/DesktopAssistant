@@ -1,0 +1,64 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:GUI.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="220"
+        x:Class="GUI.Views.EnsureDialogView"
+        x:DataType="vm:EnsureDialogViewModel"
+        Width="400" Height="220"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Title="{Binding Title}">
+
+    <Window.Styles>
+        <Style Selector="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryAccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+        </Style>
+
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="0.9"/>
+            <Setter Property="RenderTransform" Value="scale(1.02)"/>
+        </Style>
+        
+        <Style Selector="Button.Confirm">
+            <Setter Property="Background" Value="{DynamicResource SuccessBrush}"/>
+        </Style>
+
+        <Style Selector="Button.Cancel">
+            <Setter Property="Background" Value="{DynamicResource ErrorBrush}"/>
+        </Style>
+    </Window.Styles>
+    
+    <Grid RowDefinitions="*,Auto" Margin="20">
+        <!-- 对话框内容 -->
+        <StackPanel Grid.Row="0" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Message}"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center"
+                       FontSize="16"/>
+        </StackPanel>
+        
+        <!-- 按钮区域 -->
+        <StackPanel Grid.Row="1" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center" 
+                    Margin="0,20,0,0">
+            <Button Classes="Confirm"
+                    Content="{Binding ConfirmButtonText}"
+                    Command="{Binding ConfirmCommand}"/>
+            <Button Classes="Cancel"
+                    Content="{Binding CancelButtonText}"
+                    Command="{Binding CancelCommand}"/>
+        </StackPanel>
+    </Grid>
+</Window>

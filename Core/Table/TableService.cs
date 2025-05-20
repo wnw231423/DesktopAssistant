@@ -1,5 +1,6 @@
 ﻿using Data.Models;
 using Data.Models.Table;
+using Newtonsoft.Json;
 
 namespace Core.Table;
 
@@ -52,6 +53,8 @@ public class TableService
             using var context = new DaContext();
             context.Courses.Add(course);
             context.SaveChanges();
+            // 添加课程资源文件夹
+            AddCourseResourceDir(course.CourseName);
         }
         catch (Exception ex)
         {
@@ -70,6 +73,12 @@ public class TableService
             {
                 context.Courses.Remove(course);
                 context.SaveChanges();
+                // 删除课程资源文件夹
+                var courseResourceDir = Path.Combine(_courseResourseDir, course.CourseName);
+                if (Directory.Exists(courseResourceDir))
+                {
+                    Directory.Delete(courseResourceDir, true);
+                }
             }
         }
         catch (Exception ex)
@@ -81,16 +90,42 @@ public class TableService
     // 更新课程
     public void UpdateCourse(Course course)
     {
+        // 更新课程资源文件夹名字
+        var oldCourseResourceDir = Path.Combine(_courseResourseDir, GetCourseById(course.Id).CourseName);
+        var newCourseResourceDir = Path.Combine(_courseResourseDir, course.CourseName);
+        if (Directory.Exists(oldCourseResourceDir))
+        {
+            Directory.Move(oldCourseResourceDir, newCourseResourceDir);
+        }
+        
+        // 更新数据库
         RemoveCourse(course.Id);
         AddCourse(course);
     }
     
-    // 清空course表
+    // 根据ID获取课程
+    public Course GetCourseById(int id)
+    {
+        using var context = new DaContext();
+        return context.Courses.Find(id);
+    }
+    
+    // 清空course
     public void ClearCourses()
     {
         using var context = new DaContext();
         context.Courses.RemoveRange(context.Courses);
         context.SaveChanges();
+        
+        // 删除课程资源文件夹下的所有课程资源
+        if (Directory.Exists(_courseResourseDir))
+        {
+            Directory.Delete(_courseResourseDir, true);
+        }
+        
+        // 重新创建课程资源文件夹
+        Directory.CreateDirectory(_courseResourseDir);
+        
     }
     
     /****************/
@@ -133,17 +168,10 @@ public class TableService
             new Course("数据结构", "11-13", "周四", 1, 2, "A402", "赵教授")
         };
 
-        using var context = new DaContext();
         foreach (var course in courses)
         {
-            if (!context.Courses.Any(c => c.CourseName == course.CourseName &&
-                                          c.Weekday == course.Weekday))
-            {
-                context.Courses.Add(course);
-            }
+            AddCourse(course);
         }
-
-        context.SaveChanges();
     }
     
     // 获取当前是第几周
@@ -191,7 +219,7 @@ public class TableService
     private static string _courseResourseDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "course");
     
     // 创建课程资源文件夹, 每当用户添加一个课程, 则会添加一个课程资源文件夹
-    public void AddCourseResourceDir(string courseName)
+    private void AddCourseResourceDir(string courseName)
     {
         var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
         
@@ -236,9 +264,23 @@ public class TableService
         }
         File.Copy(filePath, targetFilePath);
     }
+    
+    // 获取课程资源类型
+    public List<string> GetCourseResourceTypes(string courseName)
+    {
+        var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
+        if (!Directory.Exists(courseResourceDir))
+        {
+            return new List<string>();
+        }
+        var resourceTypes = Directory.GetDirectories(courseResourceDir)
+            .Select(Path.GetFileName)
+            .ToList();
+        return resourceTypes;
+    }
 
-    // 读取某个课程的所有课程资源
-    public List<ResourceInfo> GetCourseResources(string courseName)
+    // 读取某个课程, 某个类型下的所有课程资源
+    public List<ResourceInfo> GetCourseResources(string courseName, string resourceType)
     {
         var resources = new List<ResourceInfo>();
         var courseResourceDir = Path.Combine(_courseResourseDir, courseName);
@@ -246,22 +288,21 @@ public class TableService
         {
             return resources;
         }
-        foreach (var resourceTypeDir in Directory.GetDirectories(courseResourceDir))
+        
+        var resourceTypeDir = Path.Combine(courseResourceDir, resourceType);
+        foreach (var file in Directory.GetFiles(resourceTypeDir))
         {
-            string resourceType = Path.GetFileName(resourceTypeDir);
-            foreach (var file in Directory.GetFiles(resourceTypeDir))
+            string fileName = Path.GetFileName(file);
+            FileInfo fileInfo = new FileInfo(file);
+            resources.Add(new ResourceInfo
             {
-                string fileName = Path.GetFileName(file);
-                FileInfo fileInfo = new FileInfo(file);
-                resources.Add(new ResourceInfo
-                {
-                    ResourceName = fileName,
-                    ResourcePath = file,
-                    ResourceType = resourceType,
-                    LastModified = fileInfo.LastWriteTime
-                });
-            }
+                ResourceName = fileName,
+                ResourcePath = file,
+                ResourceType = resourceType,
+                LastModified = fileInfo.LastWriteTime
+            });
         }
+        
         return resources;
     }
 
@@ -313,22 +354,35 @@ public class TableService
     {
         return _courseResourseDir;
     }
-    
+
     // 将课程信息导出为一个json文件
     public void ExportCoursesToJson(string filePath)
     {
-        // 注意ID不需要导出, 因为ID是数据库自动生成的.
-        
-        // TODO
-        throw new NotImplementedException();
+        List<Course> courses = GetCourses();
+        var settings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore
+        };
+        string json = JsonConvert.SerializeObject(courses, settings);
+        File.WriteAllText(filePath, json);
     }
-    
+
     // 将课程信息导入
     public void ImportCoursesFromJson(string filePath)
     {
-        // 注意复用前面写过的AddCourse.
-        
-        // TODO
-        throw new NotImplementedException();
+        try
+        {
+            string jsonContent = File.ReadAllText(filePath);
+            List<Course> courses = JsonConvert.DeserializeObject<List<Course>>(jsonContent);
+            foreach (var course in courses)
+            {
+                AddCourse(course);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"导入课程失败{ex.Message}");
+        }
     }
 }

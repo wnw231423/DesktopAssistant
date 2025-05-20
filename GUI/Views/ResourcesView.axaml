@@ -6,6 +6,7 @@
              xmlns:converters="using:GUI.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="GUI.Views.ResourcesView"
+             x:Name="ResourcesViewControl"
              x:DataType="vm:ResourcesViewModel">
 
     <UserControl.Resources>
@@ -47,9 +48,11 @@
                                 <!-- 资源类型标题 -->
                                 <Border Classes="group">
                                     <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <!-- 箭头按钮 - 用于折叠/展开 -->
+                                        <!-- 箭头按钮 - 修正命令绑定 -->
                                         <Button Grid.Column="0"
                                                 Content="{Binding IsExpanded, Converter={StaticResource BoolToArrow}}"
-                                                Command="{Binding (vm:ResourcesViewModel).AddResourceCommand}"
+                                                Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).ToggleExpandCommand}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent"
                                                 BorderThickness="0"
@@ -64,7 +67,7 @@
 
                                         <Button Grid.Column="2"
                                                 Content="添加"
-                                                Command="{Binding (vm:ResourcesViewModel).ToggleExpandCommand}"
+                                                Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).AddResourceCommand}"
                                                 CommandParameter="{Binding TypeName}"/>
                                     </Grid>
                                 </Border>

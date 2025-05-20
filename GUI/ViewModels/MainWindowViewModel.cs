@@ -34,8 +34,7 @@ namespace GUI.ViewModels
             // 默认导航到课表页面
             Navigate("Table");
             
-            // 应用初始化, 应当放在别处, 目前放在这里
-            // TODO: 更改位置
+            //TODO: 应用初始化, 应当放在别处, 目前暂时放在这里
             InitalizeCommands();
         }
         

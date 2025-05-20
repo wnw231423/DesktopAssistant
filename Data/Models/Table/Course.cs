@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace Data.Models.Table;
 
 public class Course
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  // 主键自增
+    [JsonIgnore]
     public int Id {get; set;}  // 主键
     public string CourseName { get; set; }
     public string? WeekRange { get; set; } // 周次范围, null时默认为所有周
