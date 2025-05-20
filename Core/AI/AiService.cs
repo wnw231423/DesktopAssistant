@@ -32,7 +32,7 @@ namespace Core.AI
         {
             _api = AiService.GetApi();
         }
-        
+
         // AI部分初始化工作, 将在程序启动时被调用
         public static void AiInit()
         {
@@ -43,7 +43,7 @@ namespace Core.AI
                 Directory.CreateDirectory(ConfigDirectory);
             }
         }
-        
+
         // 向配置文件中写入给定的API密钥和密钥
         public static void WriteApiKey(string apiKey, string secretKey)
         {
@@ -72,7 +72,7 @@ namespace Core.AI
 
             string json = File.ReadAllText(ConfigFilePath);
             var config = JsonSerializer.Deserialize<ApiConfig>(json);
-
+            
             return new API(config.ApiKey, config.SecretKey);
         }
         

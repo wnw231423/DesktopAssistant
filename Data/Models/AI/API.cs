@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
+
 namespace Data.Models.AI
 {
     public class API
@@ -18,11 +19,6 @@ namespace Data.Models.AI
 
         public API(string api_key, string secret_key)
         {
-            if (string.IsNullOrWhiteSpace(api_key) || string.IsNullOrWhiteSpace(secret_key))
-            {
-                throw new ArgumentException("无效的API凭证");
-            }
-
             _api_key = api_key;
             _secret_key = secret_key;
         }
@@ -33,7 +29,7 @@ namespace Data.Models.AI
             if (string.IsNullOrEmpty(accessToken))
             {
                 //Console.WriteLine("Failed to get access token");
-                return "Failed to get access token";
+                return "获取密钥失败";
             }
             return await ChatLoop(accessToken, inputlist);
         }
