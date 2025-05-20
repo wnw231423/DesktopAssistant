@@ -6,7 +6,7 @@
   - [x] Delete Course
   - [x] Edit Course
   - [ ] View Course's Todos
-  - [ ] Export Courses to Json
+  - [x] Export Courses to Json
 - [ ] Todo
   - [ ] Add Todo
   - [ ] Delete Todo

@@ -10,6 +10,9 @@ using MsBox.Avalonia.Base;
 using Core.AI;
 using Data.Models.AI;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
 using MsBox.Avalonia;
 
 
@@ -28,20 +31,111 @@ public partial class ConfigViewModel : ViewModelBase
     {
         try
         {
-            // ����AiServiceд������
+            // ����AiServiceд������
             AiService.WriteApiKey(Input1.Trim(), Input2.Trim());
 
-            // ��ʾ�ɹ���ʾ
-            ShowMessage("���óɹ�", "API��Կ�ѱ��浽���������ļ�");
+            // ��ʾ�ɹ���ʾ
+            ShowMessage("���óɹ�", "API��Կ�ѱ��浽���������ļ�");
         }
         catch (ArgumentException ex)
         {
-            ShowError("��������", ex.Message);
+            ShowError("��������", ex.Message);
         }
         catch (Exception ex)
         {
-            ShowError("����ʧ��", $"���ñ���ʧ�ܣ�{ex.Message}");
+            ShowError("����ʧ��", $"���ñ���ʧ�ܣ�{ex.Message}");
         }
+    }
+
+    [RelayCommand]
+    private async Task ImportCourses()
+    {
+        try
+        {
+            // 创建打开文件对话框
+            var dialog = new OpenFileDialog
+            {
+                Title = "选择课程表文件",
+                AllowMultiple = false
+            };
+
+            // 设置文件过滤器，假设导入文件是 JSON 格式
+            dialog.Filters.Add(new FileDialogFilter
+            {
+                Name = "课程表文件",
+                Extensions = new System.Collections.Generic.List<string> { "json" }
+            });
+
+            // 获取当前窗口
+            var window = GetWindow();
+            if (window == null) return;
+
+            // 显示对话框
+            var result = await dialog.ShowAsync(window);
+        
+            if (result != null && result.Length > 0)
+            {
+                string filePath = result[0];
+            
+                // 调用 TableService 的导入方法
+                var tableService = new TableService(); // 如果已有实例应该通过依赖注入获取
+                tableService.ImportCoursesFromJson(filePath);
+            
+                // 显示成功消息
+                ShowMessage("导入成功", "课程表已成功导入");
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError("导入失败", $"导入课程表时出错：{ex.Message}");
+        }
+    }
+    
+    [RelayCommand]
+    private async Task ExportCourses()
+    {
+        try
+        {
+            // 创建选择文件夹对话框
+            var dialog = new OpenFolderDialog
+            {
+                Title = "选择导出位置"
+            };
+
+            // 获取当前窗口
+            var window = GetWindow();
+            if (window == null) return;
+
+            // 显示对话框
+            var folderPath = await dialog.ShowAsync(window);
+
+            if (!string.IsNullOrEmpty(folderPath))
+            {
+                // 在选择的文件夹中创建导出文件路径
+                string exportPath = Path.Combine(folderPath, "courses_export.json");
+            
+                // 调用 TableService 的导出方法
+                var tableService = new TableService();
+                tableService.ExportCoursesToJson(exportPath);
+
+                // 显示成功消息
+                ShowMessage("导出成功", $"课程表已成功导出到：\n{exportPath}");
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError("导出失败", $"导出课程表时出错：{ex.Message}");
+        }
+    }
+
+    // 辅助方法：获取当前窗口
+    private Window GetWindow()
+    {
+        if (Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            return desktop.MainWindow;
+        }
+        return null;
     }
 
     private async void ShowMessage(string title, string message)
