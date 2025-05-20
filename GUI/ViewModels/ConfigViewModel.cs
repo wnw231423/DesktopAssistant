@@ -31,19 +31,33 @@ public partial class ConfigViewModel : ViewModelBase
     {
         try
         {
-            // ����AiServiceд������
+            //调用AiService写入配置
             AiService.WriteApiKey(Input1.Trim(), Input2.Trim());
-
-            // ��ʾ�ɹ���ʾ
-            ShowMessage("���óɹ�", "API��Կ�ѱ��浽���������ļ�");
+            if (Input1.Trim() == "" && Input2.Trim() != "")
+            {
+                ShowMessage("配置失败", "             API_KEY为空             ");
+            }
+            else if(Input1.Trim() != "" && Input2.Trim() == "")
+            {
+                ShowMessage("配置失败", "           SECRET_KEY为空           ");
+            }
+            else if(Input1.Trim() == "" && Input2.Trim() == "")
+            {
+                ShowMessage("配置失败", "    API_KEY和SECRET_KEY为空    ");
+            }
+            else
+            {
+                //显示成功提示
+                ShowMessage("配置成功", "API密钥已保存到本地配置文件");
+            }
         }
         catch (ArgumentException ex)
         {
-            ShowError("��������", ex.Message);
+            ShowError("参数错误", ex.Message);
         }
         catch (Exception ex)
         {
-            ShowError("����ʧ��", $"���ñ���ʧ�ܣ�{ex.Message}");
+            ShowError("保存失败", $"配置保存失败：{ex.Message}");
         }
     }
 

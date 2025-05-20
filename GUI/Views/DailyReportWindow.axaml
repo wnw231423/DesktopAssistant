@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="GUI.Views.DailyReportWindow"
@@ -11,23 +12,15 @@
 		WindowStartupLocation="CenterOwner"
         TransparencyLevelHint="AcrylicBlur"
         ExtendClientAreaToDecorationsHint="True">
-	<!-- 使用 DockPanel 作为根布局容器 -->
-	<DockPanel LastChildFill="True">
-		<!-- 标题栏区域 -->
-		<TextBlock DockPanel.Dock="Top"
-                   Text="AI日报"
-                   FontSize="20"
-                   Margin="0 10"
-                   HorizontalAlignment="Center"/>
 
-		<!-- 主内容区域：滚动视图 -->
-		<ScrollViewer Margin="20 0">
-			<StackPanel Spacing="20">
-				<!-- AI 响应文本 -->
-				<TextBlock Text="{Binding AiResponse}"
-                           FontSize="16"
-                           />
-			</StackPanel>
-		</ScrollViewer>
-	</DockPanel>
+
+	<Design.DataContext>
+		<vm:DailyReportWindowViewModel />
+	</Design.DataContext>
+
+	<md:MarkdownViewer
+        Markdown="{Binding AiResponse}"
+        Background="White"
+        Padding="20"/>
+	
 </Window>
