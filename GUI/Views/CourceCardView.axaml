@@ -28,7 +28,7 @@
         <Style Selector="TextBlock.Label">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="0,6,0,6"/>
-            <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}"/>
             <Setter Property="FontSize" Value="{StaticResource NormalFontSize}"/>
             <Setter Property="FontWeight" Value="Medium"/>
         </Style>
@@ -295,8 +295,15 @@
         </StackPanel>
 
         <!-- 课程资源 -->
-        <views:TodoListView Grid.Row="1"
-                             DataContext="{Binding TodoList}"
-                             Margin="0,10,0,0"/>
+        <Border Grid.Row="1"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource BorderBrush}"
+                CornerRadius="16"
+                Padding="24,20"
+                Margin="0,0,0,0" 
+                Background="{DynamicResource CardBackgroundBrush}"
+                BoxShadow="0 6 20 0 #25000000">
+            <views:TodoListView DataContext="{Binding TodoList}"/>
+        </Border>
     </Grid>
 </UserControl>
