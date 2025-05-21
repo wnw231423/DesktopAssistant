@@ -90,14 +90,19 @@ public class TableService
     // 更新课程
     public void UpdateCourse(Course course)
     {
-        // 更新课程资源文件夹名字
-        var oldCourseResourceDir = Path.Combine(_courseResourseDir, GetCourseById(course.Id).CourseName);
-        var newCourseResourceDir = Path.Combine(_courseResourseDir, course.CourseName);
-        if (Directory.Exists(oldCourseResourceDir))
+        var oldName = GetCourseById(course.Id).CourseName;
+        var newName = course.CourseName;
+        if (oldName != newName)
         {
-            Directory.Move(oldCourseResourceDir, newCourseResourceDir);
+            // 更新课程资源文件夹名字
+            var oldCourseResourceDir = Path.Combine(_courseResourseDir, oldName);
+            var newCourseResourceDir = Path.Combine(_courseResourseDir, newName);
+            if (Directory.Exists(oldCourseResourceDir))
+            {
+                Directory.Move(oldCourseResourceDir, newCourseResourceDir);
+            }
         }
-        
+
         // 更新数据库
         RemoveCourse(course.Id);
         AddCourse(course);
