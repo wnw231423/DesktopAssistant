@@ -134,18 +134,21 @@ namespace GUI.Converters
     {
         public object Convert(IList<object> values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Count < 3 || values[0] is not DateTime startTime)
+            if (values.Count < 3 || !(values[0] is DateTime startTime))
                 return string.Empty;
 
             bool isLongTerm = values[2] is bool lt && lt;
 
             if (isLongTerm)
-                return $"{startTime:MM/dd HH:mm} - 长期";
+                return $"{startTime:yyyy/MM/dd} - 长期";
 
+            // 只处理 DateTime 类型
             if (values[1] is DateTime endTime)
-                return $"{startTime:MM/dd HH:mm} - {endTime:MM/dd HH:mm}";
+            {
+                return $"{startTime:yyyy/MM/dd} - {endTime:yyyy/MM/dd}";
+            }
 
-            return $"{startTime:MM/dd HH:mm}";
+            return $"{startTime:yyyy/MM/dd}";
         }
     }
 }

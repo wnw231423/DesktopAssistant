@@ -15,9 +15,9 @@
         <converters:BoolToArrowConverter x:Key="BoolToArrowConverter"/>
     </UserControl.Resources>
 
-    <Grid RowDefinitions="Auto, *, Auto, Auto, Auto">
+    <Grid RowDefinitions="Auto, *, Auto, Auto">
         <!-- 顶部控制区 -->
-        <Grid Grid.Row="0" ColumnDefinitions="*, Auto, Auto" Margin="0,0,0,10">
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto, Auto" Margin="0,10,0,10">
             <ComboBox Grid.Column="0"
                       HorizontalAlignment="Left"
                       ItemsSource="{Binding SortOptions}"
@@ -139,10 +139,8 @@
             <Button Grid.Column="2"
                     Command="{Binding ToggleDetailedAddModeCommand}"
                     Margin="5,0,0,0"
-                    Padding="12,8">
-                <PathIcon Data="{Binding IsDetailedAddMode, Converter={StaticResource BoolToArrowConverter}}"
-                          Width="16"
-                          Height="16"/>
+                    Padding="12,8"
+                    Content="{Binding IsDetailedAddMode, Converter={StaticResource BoolToArrow}}">
             </Button>
         </Grid>
 
@@ -160,7 +158,7 @@
                            Text="开始时间:"
                            VerticalAlignment="Center"
                            Margin="0,0,5,0"/>
-                <DatePicker Grid.Column="1"
+                <CalendarDatePicker Grid.Column="1"
                             SelectedDate="{Binding StartTime}"/>
 
                 <TextBlock Grid.Column="2"
@@ -168,7 +166,7 @@
                            VerticalAlignment="Center"
                            Margin="10,0,5,0"
                            IsEnabled="{Binding !IsLongTerm}"/>
-                <DatePicker Grid.Column="3"
+                <CalendarDatePicker Grid.Column="3"
                             SelectedDate="{Binding EndTime}"
                             IsEnabled="{Binding !IsLongTerm}"/>
             </Grid>
@@ -191,10 +189,6 @@
                           SelectedItem="{Binding CourseTag}"
                           IsVisible="{Binding !IsCourseSpecified}"/>
             </Grid>
-        </Grid>
-        
-        <Grid Grid.Row="4">
-            <Label>Hello</Label>
         </Grid>
     </Grid>
 </UserControl>

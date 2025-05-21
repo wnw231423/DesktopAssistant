@@ -5,6 +5,7 @@ using System.Linq;
 using Core.Todo;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Core.Table;
 using Data.Models.Todo;
 
 namespace GUI.ViewModels
@@ -14,7 +15,7 @@ namespace GUI.ViewModels
         private readonly TodoService _todoService;
 
         [ObservableProperty]
-        private bool isCourseSpecified;
+        private bool _isCourseSpecified;
 
         [ObservableProperty]
         private string? _specificCourseTag;
@@ -35,13 +36,13 @@ namespace GUI.ViewModels
         private bool _isDetailedAddMode = false;
 
         [ObservableProperty]
-        private DateTime _startTime = DateTime.Now;
+        private DateTime? _startTime = DateTime.Today;
 
         [ObservableProperty]
-        private DateTime? _endTime = DateTime.Now.AddDays(1);
+        private DateTime? _endTime;
 
         [ObservableProperty]
-        private bool _isLongTerm = false;
+        private bool _isLongTerm = true;
 
         [ObservableProperty]
         private string _courseTag = string.Empty;
@@ -70,9 +71,8 @@ namespace GUI.ViewModels
 
         private void LoadAvailableCourses()
         {
-            var courses = _todoService.GetTodoItems()
-                .Select(t => t.CourseTag)
-                .Where(tag => !string.IsNullOrEmpty(tag))
+            var courses = new TableService().GetCourses()
+                .Select(c => c.CourseName)
                 .Distinct()
                 .ToList();
 
@@ -87,6 +87,10 @@ namespace GUI.ViewModels
         private void ToggleDetailedAddMode()
         {
             IsDetailedAddMode = !IsDetailedAddMode;
+            if (!IsDetailedAddMode)
+            {
+                IsLongTerm = true;
+            }
         }
 
         [RelayCommand]
@@ -96,8 +100,18 @@ namespace GUI.ViewModels
                 return;
 
             string tag = IsCourseSpecified ? SpecificCourseTag : CourseTag;
-            DateTime start = StartTime;
-            DateTime? end = IsLongTerm ? null : EndTime;
+            DateTime start;
+            DateTime? end;
+            if (!_isDetailedAddMode)
+            {
+                start = DateTime.Now;
+                end = null;
+            }
+            else
+            {
+                start = StartTime ?? DateTime.Now;
+                end = IsLongTerm ? null : EndTime;
+            }
 
             var todoItem = new TodoItem(NewItemContent, start, end, IsLongTerm, tag);
             _todoService.AddTodoItem(todoItem);
@@ -182,9 +196,9 @@ namespace GUI.ViewModels
             {
                 // 获取数据的副本而不是引用
                 var items = _todoService.GetTodoItems().ToList();
-        
+
                 System.Diagnostics.Debug.WriteLine($"从服务获取了 {items.Count} 个任务项");
-        
+
                 // 筛选和排序前进行深拷贝，避免修改原始数据
                 var filteredItems = items.Select(item => new TodoItem(
                     item.Content,
@@ -196,7 +210,7 @@ namespace GUI.ViewModels
                     Id = item.Id,
                     IsDone = item.IsDone
                 }).AsEnumerable();
-        
+
                 if (IsCourseSpecified)
                 {
                     filteredItems = filteredItems.Where(item => item.CourseTag == SpecificCourseTag);
@@ -207,27 +221,60 @@ namespace GUI.ViewModels
                     filteredItems = filteredItems.Where(item => !item.IsDone);
                 }
 
-                switch (SelectedSortOption)
+                // 如果选择了按课程分类视图模式
+                if (SelectedViewMode == "按课程分类")
                 {
-                    case "开始时间":
-                        filteredItems = filteredItems.OrderBy(item => item.StartTime);
-                        break;
-                    case "结束时间":
-                        filteredItems = filteredItems.OrderBy(item => item.IsLongTerm)
-                            .ThenBy(item => item.EndTime ?? DateTime.MaxValue);
-                        break;
+                    // 按课程分组，然后在每个组内按指定条件排序
+                    var groupedItems = filteredItems
+                        .GroupBy(item => string.IsNullOrEmpty(item.CourseTag) ? "未分类" : item.CourseTag)
+                        .SelectMany(group => {
+                            // 在每个分组内应用排序然后返回排序后的元素列表
+                            IEnumerable<TodoItem> sortedItems;
+                            
+                            switch (SelectedSortOption)
+                            {
+                                case "开始时间":
+                                    sortedItems = group.OrderBy(item => item.StartTime);
+                                    break;
+                                case "结束时间":
+                                    sortedItems = group.OrderBy(item => item.IsLongTerm)
+                                        .ThenBy(item => item.EndTime ?? DateTime.MaxValue);
+                                    break;
+                                default:
+                                    sortedItems = group; // 默认不排序
+                                    break;
+                            }
+
+                            return sortedItems;
+                        });
+
+                    filteredItems = groupedItems;
+                }
+                else
+                {
+                    // 原有的排序逻辑
+                    switch (SelectedSortOption)
+                    {
+                        case "开始时间":
+                            filteredItems = filteredItems.OrderBy(item => item.StartTime);
+                            break;
+                        case "结束时间":
+                            filteredItems = filteredItems.OrderBy(item => item.IsLongTerm)
+                                .ThenBy(item => item.EndTime ?? DateTime.MaxValue);
+                            break;
+                    }
                 }
 
                 // 使用临时列表避免多次触发集合变更通知
                 var tempList = filteredItems.ToList();
                 TodoItems.Clear();
-        
+
                 foreach (var item in tempList)
                 {
                     TodoItems.Add(item);
                 }
-        
-                System.Diagnostics.Debug.WriteLine($"加载了 {TodoItems.Count} 个任务到视图");
+
+                System.Diagnostics.Debug.WriteLine($"加载了 {TodoItems.Count} 个任务到视图，视图模式：{SelectedViewMode}");
             }
             catch (Exception ex)
             {

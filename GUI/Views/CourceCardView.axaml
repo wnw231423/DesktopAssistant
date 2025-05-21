@@ -295,8 +295,8 @@
         </StackPanel>
 
         <!-- 课程资源 -->
-        <views:ResourcesView Grid.Row="1"
-                             DataContext="{Binding ResourcesViewModel}"
+        <views:TodoListView Grid.Row="1"
+                             DataContext="{Binding TodoList}"
                              Margin="0,10,0,0"/>
     </Grid>
 </UserControl>

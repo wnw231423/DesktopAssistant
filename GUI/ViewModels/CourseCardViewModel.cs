@@ -10,6 +10,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Core.Table;
+using Core.Todo;
 using Data.Models.Table;
 using GUI.Views;
 using MsBox.Avalonia;
@@ -26,7 +27,7 @@ public partial class CourseCardViewModel : ObservableObject
 
     private Course _originalCourse; // 用于存储原始值以便取消编辑
     
-    public ResourcesViewModel ResourcesViewModel { get; }
+    public TodoListViewModel TodoList { get; set; }
 
     public string EditButtonText => IsEditing ? "完成" : "编辑";
 
@@ -41,7 +42,7 @@ public partial class CourseCardViewModel : ObservableObject
     {
         _course = course ?? throw new ArgumentNullException(nameof(course));
         _originalCourse = CloneCourse(course);
-        ResourcesViewModel = new ResourcesViewModel(new TableService(), course);
+        TodoList = new TodoListViewModel(new TodoService(), Course.CourseName);
 
         // 初始化星期选项
         WeekdayOptions = new ObservableCollection<string>
@@ -76,7 +77,7 @@ public partial class CourseCardViewModel : ObservableObject
         Course = updatedCourse;
         
         // 通知ResourcesViewModel课程可能已更改
-        ResourcesViewModel.Course = Course;
+        TodoList = new TodoListViewModel(new TodoService(), Course.CourseName);
     }
 
     [RelayCommand]

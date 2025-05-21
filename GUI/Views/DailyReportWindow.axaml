@@ -5,6 +5,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="GUI.Views.DailyReportWindow"
         xmlns:vm="using:GUI.ViewModels"
+        xmlns:controls="clr-namespace:MarkdownViewer.Core.Controls;assembly=MarkdownViewer.Core"
         x:DataType="vm:DailyReportWindowViewModel"
 		mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
         Title="每日AI报告"
@@ -18,8 +19,8 @@
 		<vm:DailyReportWindowViewModel />
 	</Design.DataContext>
 
-	<md:MarkdownViewer
-        Markdown="{Binding AiResponse}"
+	<controls:MarkdownViewer
+        MarkdownText="{Binding AiResponse}"
         Background="White"
         Padding="20"/>
 	
