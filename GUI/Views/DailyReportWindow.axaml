@@ -18,10 +18,20 @@
 	<Design.DataContext>
 		<vm:DailyReportWindowViewModel />
 	</Design.DataContext>
+	
+	<StackPanel Margin="20" Spacing="10">
+		<!-- 标题文字 -->
+		<TextBlock Text="每日简报"
+                   FontSize="40"
+                   FontWeight="Bold"
+                   Foreground="Black"
+                   HorizontalAlignment="Center"/>
 
-	<controls:MarkdownViewer
+		<controls:MarkdownViewer
         MarkdownText="{Binding AiResponse}"
         Background="White"
-        Padding="20"/>
+        Padding="20,10,20,10"/>
+	</StackPanel>
+	
 	
 </Window>

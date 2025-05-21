@@ -5,6 +5,8 @@ using Avalonia.Markup.Xaml;
 using Markdown.Avalonia;
 using GUI.ViewModels;
 using System;
+using Core.Table;
+using Core.Todo;
 
 namespace GUI.Views;
 
@@ -17,7 +19,7 @@ public partial class DailyReportWindow : Window
     }
     private async void InitializeAsync()
     {
-        var viewModel = new DailyReportWindowViewModel();
+        var viewModel = new DailyReportWindowViewModel(new TableService(), new TodoService());
         DataContext = viewModel;
         await viewModel.LoadAiResponse();
     }
