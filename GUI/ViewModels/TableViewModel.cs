@@ -39,8 +39,7 @@ public partial class TableViewModel : ViewModelBase
             _currentWeek = 1;
         
         // 加入一些sample课程
-        //TODO： 在开发结束后删除
-        _tableService.AddSampleCourses();
+        //_tableService.AddSampleCourses();
         
         // 加载课程
         LoadCourses();

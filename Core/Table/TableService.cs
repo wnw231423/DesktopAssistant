@@ -137,7 +137,7 @@ public class TableService
     {
         try
         {
-            var courses = GetCourses();
+            var courses = GetTodaysCourses();
             if (courses == null || courses.Count == 0)
             {
                 return "暂无课程信息";
