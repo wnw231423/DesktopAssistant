@@ -1,37 +1,60 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
-		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:md="https://github.com/whistyun/Markdown.Avalonia"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="GUI.Views.DailyReportWindow"
         xmlns:vm="using:GUI.ViewModels"
         xmlns:controls="clr-namespace:MarkdownViewer.Core.Controls;assembly=MarkdownViewer.Core"
         x:DataType="vm:DailyReportWindowViewModel"
-		mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="300"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="600"
         Title="每日AI报告"
         Width="600" Height="600"
-		WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterOwner"
         TransparencyLevelHint="AcrylicBlur"
-        ExtendClientAreaToDecorationsHint="True">
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaTitleBarHeightHint="32">
 
+    <Design.DataContext>
+        <vm:DailyReportWindowViewModel />
+    </Design.DataContext>
 
-	<Design.DataContext>
-		<vm:DailyReportWindowViewModel />
-	</Design.DataContext>
-	
-	<StackPanel Margin="20" Spacing="10">
-		<!-- 标题文字 -->
-		<TextBlock Text="每日简报"
-                   FontSize="40"
-                   FontWeight="Bold"
-                   Foreground="Black"
-                   HorizontalAlignment="Center"/>
+    <Border Background="{DynamicResource PrimaryBackgroundBrush}"
+            CornerRadius="12" 
+            Margin="8"
+            BoxShadow="0 4 8 0 #40000000">
+        <Grid RowDefinitions="Auto,*">
+            <!-- 标题栏 -->
+            <Border Grid.Row="0"
+                    Name="TitleBarHost"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    CornerRadius="12 12 0 0"
+                    Height="60" 
+                    VerticalAlignment="Top">
+                <TextBlock Text="每日简报"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource PrimaryAccentBrush}"/>
+            </Border>
 
-		<controls:MarkdownViewer
-        MarkdownText="{Binding AiResponse}"
-        Background="White"
-        Padding="20,10,20,10"/>
-	</StackPanel>
-	
-	
+            <!-- 内容区域 -->
+            <Border Grid.Row="1"
+                    Background="{DynamicResource SecondaryBackgroundBrush}"
+                    Margin="12,0,12,12"
+                    CornerRadius="8"
+                    Padding="2"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource BorderBrush}">
+                <controls:MarkdownViewer
+                    MarkdownText="{Binding AiResponse}"
+                    Background="{DynamicResource CardBackgroundBrush}"
+                    Foreground="{DynamicResource PrimaryForegroundBrush}"
+                    Padding="16"
+                    CornerRadius="6"/>
+            </Border>
+        </Grid>
+    </Border>
 </Window>

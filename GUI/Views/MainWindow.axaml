@@ -17,7 +17,7 @@
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-
+        
     <Window.Styles>
         <!-- 侧边导航按钮样式 -->
         <Style Selector="Button.NavButton">

@@ -17,7 +17,7 @@
     <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource ChenwuGrayColor}"/>
     
     <!-- 功能性颜色 -->
-    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource DonghuBlueColor}"/>
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource LuoyingPinkColor}"/>
     <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource LuojiaGreenColor}"/>
     <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource QiuguiYellowColor}"/>
     <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource ShuangyeRedColor}"/>

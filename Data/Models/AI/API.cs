@@ -61,7 +61,7 @@ namespace Data.Models.AI
             var answer2 = ParseResponse(response2);
             //Console.WriteLine($"{answer2}");
 
-            var preinput = "然后请根据下面的内容简要概括出今天所需要干的事情，分点输出上午和下午和晚上要干的每个任务，课程的上下午按照开始时间算，如果有具体时间则一并输出任务的时间，如果有长期任务则单独列出来（已完成的不需要再显示）不要写到晚上任务处，不需要输出今天的日期，只输出任务。";
+            var preinput = "然后请根据下面的内容帮我简要概括出今天所需要干的事情，用md格式. 不需要输出今天的日期，只输出任务, 已完成的不需要输出。最后再提出一点建议，给出一些积极向上的话语，鼓励我今天好好学习，努力工作。";
             var inputtodo = answer1 + preinput + inputlist;
             var responsetodo = await SendChatRequest(client, accessToken, inputtodo);
             var answertodo = ParseResponse(responsetodo);
@@ -81,7 +81,7 @@ namespace Data.Models.AI
 
                 Console.WriteLine($"AI：{answer}");
             }*/
-            return answer1 +"\n" + "\n" + answer2 + "\n" + "\n" + "今天的任务是：\n"  + answertodo+ "\n" + "\n" + "祝您度过元气满满的一天！";
+            return answer1 +"\n" + "\n" + answer2 + "\n" + "\n" + "今天的任务是：\n"  + answertodo+ "\n";
         }
 
         public async Task<string> SendChatRequest(HttpClient client, string accessToken, string message)

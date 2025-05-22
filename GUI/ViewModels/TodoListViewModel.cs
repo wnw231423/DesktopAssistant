@@ -52,7 +52,7 @@ namespace GUI.ViewModels
 
         public List<string> SortOptions { get; } = new List<string> { "开始时间", "结束时间" };
         public List<string> ViewModes { get; } = new List<string> { "所有任务", "按课程分类" };
-        public ObservableCollection<string> AvailableCourses { get; } = new ();
+        public ObservableCollection<string?> AvailableCourses { get; } = new ();
 
         public TodoListViewModel(TodoService todoService, string specificCourseTag = null)
         {
@@ -90,6 +90,7 @@ namespace GUI.ViewModels
             if (!IsDetailedAddMode)
             {
                 IsLongTerm = true;
+                CourseTag = string.Empty;
             }
         }
 

@@ -7,118 +7,180 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="GUI.Views.ResourcesView"
              x:Name="ResourcesViewControl"
-             x:DataType="vm:ResourcesViewModel">
+             x:DataType="vm:ResourcesViewModel"
+             Padding="16">
 
     <UserControl.Resources>
         <converters:BoolToArrowConverter x:Key="BoolToArrow"/>
         <converters:BoolToStringConverter x:Key="BoolToString"/>
     </UserControl.Resources>
 
-    <UserControl.Styles>
-        <!-- 样式省略 -->
-    </UserControl.Styles>
-
-    <Grid RowDefinitions="Auto,*">
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,10">
-            <TextBlock Grid.Column="0"
+    <Grid RowDefinitions="Auto,*" Background="{DynamicResource SecondaryBackgroundBrush}">
+        <!-- 顶部标题区域 -->
+        <Border Grid.Row="0" 
+                Background="{DynamicResource CardBackgroundBrush}"
+                CornerRadius="8"
+                Padding="16,12"
+                Margin="0,0,0,16"
+                BoxShadow="0 2 4 0 #20000000">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Grid.Column="0"
                        Text="{Binding Course.CourseName, StringFormat='{}{0} - 课程资源'}"
-                       FontSize="18" FontWeight="SemiBold"
+                       FontSize="18" 
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource PrimaryForegroundBrush}"
                        VerticalAlignment="Center"/>
 
-            <Button Grid.Column="1"
+                <Button Grid.Column="1"
                     Content="{Binding IsEditMode, Converter={StaticResource BoolToString}, ConverterParameter='取消|编辑'}"
                     Command="{Binding ToggleEditModeCommand}"
+                    Background="{DynamicResource PrimaryAccentBrush}"
+                    Foreground="White"
+                    Padding="12,8"
+                    CornerRadius="4"
                     Margin="0,0,10,0"/>
 
-            <Button Grid.Column="2"
+                <Button Grid.Column="2"
                     Content="添加新类型"
                     Command="{Binding AddResourceTypeCommand}"
+                    Background="{DynamicResource PrimaryAccentBrush}"
+                    Foreground="White"
+                    Padding="12,8"
+                    CornerRadius="4"
                     IsVisible="{Binding !IsEditMode}"/>
-        </Grid>
+            </Grid>
+        </Border>
 
         <!-- 资源列表 -->
-        <ScrollViewer Grid.Row="1">
-            <StackPanel>
-                <!-- 无资源时显示 -->
-                <TextBlock Text="此课程暂无资源，请点击类别旁的添加按钮上传资源。"
-                           IsVisible="{Binding !ResourceGroups.Count}"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Margin="0,20,0,0"/>
+        <Border Grid.Row="1"
+                Background="{DynamicResource PrimaryBackgroundBrush}"
+                CornerRadius="8"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource BorderBrush}">
+            <ScrollViewer Padding="16">
+                <StackPanel>
+                    <!-- 无资源时显示 -->
+                    <Border Background="{DynamicResource SecondaryBackgroundBrush}"
+                            CornerRadius="6"
+                            Padding="20"
+                            IsVisible="{Binding !ResourceGroups.Count}">
+                        <TextBlock Text="此课程暂无资源，请点击类别旁的添加按钮上传资源。"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource PrimaryForegroundBrush}"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"/>
+                    </Border>
 
-                <!-- 资源组列表 - 不使用编译时绑定 -->
-                <ItemsControl ItemsSource="{Binding ResourceGroups}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="0,0,0,5">
-                                <!-- 资源类型标题 -->
-                                <Border Classes="group">
-                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-                                        <!-- 箭头按钮 - 用于折叠/展开 -->
-                                        <Button Grid.Column="0"
-                                                Content="{Binding IsExpanded, Converter={StaticResource BoolToArrow}}"
-                                                Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).ToggleExpandCommand}"
-                                                CommandParameter="{Binding}"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Padding="0"
-                                                Margin="0,0,8,0"
-                                                VerticalAlignment="Center"/>
+                    <!-- 资源组列表 -->
+                    <ItemsControl ItemsSource="{Binding ResourceGroups}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,12">
+                                    <!-- 资源类型标题 -->
+                                    <Border Background="{DynamicResource CardBackgroundBrush}"
+                                            CornerRadius="6"
+                                            Padding="12,10"
+                                            BorderThickness="1"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BoxShadow="0 1 3 0 #10000000">
+                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                            <!-- 箭头按钮 - 用于折叠/展开 -->
+                                            <Button Grid.Column="0"
+                                                    Content="{Binding IsExpanded, Converter={StaticResource BoolToArrow}}"
+                                                    Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).ToggleExpandCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="Transparent"
+                                                    BorderThickness="0"
+                                                    Padding="0"
+                                                    Margin="0,0,12,0"
+                                                    VerticalAlignment="Center"
+                                                    Foreground="{DynamicResource SecondaryAccentBrush}"/>
 
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding TypeName}"
-                                                   FontWeight="SemiBold"
-                                                   VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding TypeName}"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource PrimaryForegroundBrush}"
+                                                       VerticalAlignment="Center"/>
 
-                                        <Button Grid.Column="2"
-                                                Content="添加"
-                                                Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).AddResourceCommand}"
-                                                CommandParameter="{Binding TypeName}"
-                                                IsVisible="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).IsEditMode, Converter={x:Static BoolConverters.Not}}"/>
+                                            <Button Grid.Column="2"
+                                                    Content="添加"
+                                                    Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).AddResourceCommand}"
+                                                    CommandParameter="{Binding TypeName}"
+                                                    Background="{DynamicResource SecondaryAccentBrush}"
+                                                    Foreground="White"
+                                                    Padding="10,6"
+                                                    CornerRadius="4"
+                                                    Margin="0,0,8,0"
+                                                    IsVisible="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).IsEditMode, Converter={x:Static BoolConverters.Not}}"/>
 
-                                        <Button Grid.Column="3"
-                                                Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).DeleteResourceTypeCommand}"
-                                                CommandParameter="{Binding TypeName}"
-                                                IsVisible="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).IsEditMode}">
-                                            <PathIcon Data="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8.46,11.88L9.87,10.47L12,12.59L14.12,10.47L15.53,11.88L13.41,14L15.53,16.12L14.12,17.53L12,15.41L9.88,17.53L8.47,16.12L10.59,14L8.46,11.88M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z"/>
-                                        </Button>
-                                    </Grid>
-                                </Border>
+                                            <Button Grid.Column="3"
+                                                    Command="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).DeleteResourceTypeCommand}"
+                                                    CommandParameter="{Binding TypeName}"
+                                                    Background="{DynamicResource ErrorBrush}"
+                                                    Foreground="White"
+                                                    Padding="8,6"
+                                                    CornerRadius="4"
+                                                    IsVisible="{Binding $parent[ItemsControl].((vm:ResourcesViewModel)DataContext).IsEditMode}">
+                                                <PathIcon Data="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8.46,11.88L9.87,10.47L12,12.59L14.12,10.47L15.53,11.88L13.41,14L15.53,16.12L14.12,17.53L12,15.41L9.88,17.53L8.47,16.12L10.59,14L8.46,11.88M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z"
+                                                         Width="16"
+                                                         Height="16"/>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
 
-                                <!-- 资源项列表 -->
-                                <ItemsControl ItemsSource="{Binding Resources}"
-                                              IsVisible="{Binding IsExpanded}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Classes="item" Margin="30,4,0,0">
-                                                <Grid ColumnDefinitions="*,Auto,Auto">
-                                                    <TextBlock Grid.Column="0"
-                                                              Text="{Binding ResourceName}"
-                                                              VerticalAlignment="Center" />
+                                    <!-- 资源项列表 -->
+                                    <ItemsControl ItemsSource="{Binding Resources}"
+                                                  IsVisible="{Binding IsExpanded}"
+                                                  Margin="20,0,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{DynamicResource SecondaryBackgroundBrush}"
+                                                        CornerRadius="6"
+                                                        Padding="12,8"
+                                                        Margin="0,6,0,0"
+                                                        BorderThickness="1"
+                                                        BorderBrush="{DynamicResource BorderBrush}">
+                                                    <Grid ColumnDefinitions="*,Auto,Auto">
+                                                        <TextBlock Grid.Column="0"
+                                                                 Text="{Binding ResourceName}"
+                                                                 Foreground="{DynamicResource PrimaryForegroundBrush}"
+                                                                 VerticalAlignment="Center" />
 
-                                                    <Button Grid.Column="1"
-                                                            Command="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).OpenResourceCommand}"
-                                                            CommandParameter="{Binding}"
-                                                            Content="打开"
-                                                            IsVisible="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).IsEditMode, Converter={x:Static BoolConverters.Not}}"
-                                                            Margin="5,0,0,0"/>
+                                                        <Button Grid.Column="1"
+                                                                Command="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).OpenResourceCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                Content="打开"
+                                                                Background="{DynamicResource InfoBrush}"
+                                                                Foreground="White"
+                                                                Padding="10,6"
+                                                                CornerRadius="4"
+                                                                IsVisible="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).IsEditMode, Converter={x:Static BoolConverters.Not}}"
+                                                                Margin="10,0,8,0"/>
 
-                                                    <Button Grid.Column="2"
-                                                            Command="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).DeleteResourceCommand}"
-                                                            CommandParameter="{Binding}"
-                                                            IsVisible="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).IsEditMode}">
-                                                        <PathIcon Data="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M9,3V4H15V3H9M14,17V11H16V17H14M10,17V11H12V17H10Z"/>
-                                                    </Button>
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-        </ScrollViewer>
+                                                        <Button Grid.Column="2"
+                                                                Command="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).DeleteResourceCommand}"
+                                                                CommandParameter="{Binding}"
+                                                                Background="{DynamicResource ErrorBrush}"
+                                                                Foreground="White"
+                                                                Padding="8,6"
+                                                                CornerRadius="4"
+                                                                IsVisible="{Binding $parent[UserControl].((vm:ResourcesViewModel)DataContext).IsEditMode}">
+                                                            <PathIcon Data="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M9,3V4H15V3H9M14,17V11H16V17H14M10,17V11H12V17H10Z"
+                                                                     Width="16"
+                                                                     Height="16"/>
+                                                        </Button>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
     </Grid>
 </UserControl>

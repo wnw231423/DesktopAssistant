@@ -39,7 +39,7 @@ public class TodoItem
     public override string ToString()
     {
         string courseTagDisplay = string.IsNullOrEmpty(CourseTag) ? "无课程标签" : CourseTag;
-        string endTimeDisplay = IsLongTerm ? "长期持续" : EndTime?.ToString("yyyy-MM-dd HH:mm") ?? "未设定";
+        string endTimeDisplay = IsLongTerm ? "长期持续" : EndTime?.ToString("yyyy-MM-dd") ?? "未设定";
         string statusDisplay = IsDone ? "[已完成] " : "";
     
         return $"{statusDisplay}[{courseTagDisplay}] {Content}（{StartTime:yyyy-MM-dd HH:mm} - {endTimeDisplay}）";
