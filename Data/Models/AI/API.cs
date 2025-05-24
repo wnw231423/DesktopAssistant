@@ -51,7 +51,7 @@ namespace Data.Models.AI
             //Console.WriteLine("文心一言对话系统（输入'exit'退出）");
             Console.WriteLine("祝您度过充实的一天！");
             //预先设定要根据输入提供今日提醒
-            var input1 = "今天是几号";
+            var input1 = "今天是几号，输出md格式，加大粗体";
             var response1 = await SendChatRequest(client, accessToken, input1);
             var answer1 = ParseResponse(response1);
             //Console.WriteLine($"{answer1}");
@@ -81,7 +81,7 @@ namespace Data.Models.AI
 
                 Console.WriteLine($"AI：{answer}");
             }*/
-            return answer1 +"\n" + "\n" + answer2 + "\n" + "\n" + "今天的任务是：\n"  + answertodo+ "\n";
+            return answer1 +"\n" + "\n" + answer2 + "\n" + "\n"  + answertodo+ "\n";
         }
 
         public async Task<string> SendChatRequest(HttpClient client, string accessToken, string message)
